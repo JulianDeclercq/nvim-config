@@ -163,6 +163,11 @@ vim.opt.confirm = true
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
+vim.api.nvim_create_user_command('PwdCopy', function()
+  local dir = vim.fn.expand '%:p:h'
+  vim.fn.setreg('+', dir)
+  vim.notify('Copied to clipboard: ' .. dir, vim.log.levels.INFO, { title = 'PwdCopy' })
+end, { desc = 'Copy current buffer directory to clipboard' })
 
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
