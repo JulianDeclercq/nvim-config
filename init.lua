@@ -204,6 +204,12 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 -- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
 -- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
 -- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
+--
+-- Julle: Map <leader>W to <C-w> (window command mode) every standard window command still works. Set `remap` to true to allow whichfolke/which-key to show the overlay
+-- normal mode
+vim.keymap.set('n', '<leader>w', '<C-w>', { remap = true, silent = true, desc = 'Window command prefix' })
+-- visual mode
+vim.keymap.set('v', '<leader>w', '<C-w>', { remap = true, silent = true, desc = 'Window command prefix (visual)' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
