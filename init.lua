@@ -988,6 +988,9 @@ end
 
 -- Julle TermHere command
 local function term_here(args)
+  -- Determine OS (true if Windows)
+  local is_windows = (vim.loop.os_uname().sysname == 'Windows_NT')
+
   -- Try to get the full path of the current buffer:
   local cur_path = vim.api.nvim_buf_get_name(0)
   local bufdir = ''
@@ -996,7 +999,7 @@ local function term_here(args)
     -- Current buffer has a file: use its directory
     bufdir = vim.fn.fnamemodify(cur_path, ':h')
   else
-    -- Current buffer is empty: try to find the alternate buffer (#
+    -- Current buffer is empty: try to find the alternate buffer (#)
     local alt_buf = vim.fn.bufnr '#'
     if alt_buf ~= 0 then
       local alt_name = vim.api.nvim_buf_get_name(alt_buf)
@@ -1017,11 +1020,30 @@ local function term_here(args)
   -- Change the window-local directory to bufdir
   vim.cmd('lcd ' .. vim.fn.fnameescape(bufdir))
 
-  -- Finally, launch :terminal (forward any extra arguments)
-  if #args.fargs > 0 then
-    vim.cmd('terminal ' .. table.concat(args.fargs, ' '))
+  -- Build the terminal‐launch command depending on OS:
+  local term_cmd
+  if is_windows then
+    -- On Windows, try pwsh (PowerShell Core); if not found, fallback to powershell.exe
+    local pwsh_exists = vim.fn.executable 'pwsh' == 1
+    if pwsh_exists then
+      term_cmd = 'pwsh'
+    else
+      term_cmd = 'powershell.exe'
+    end
+
+    -- If the user passed additional arguments, append them after the shell executable.
+    if #args.fargs > 0 then
+      term_cmd = term_cmd .. ' ' .. table.concat(args.fargs, ' ')
+    end
+
+    vim.cmd('terminal ' .. term_cmd)
   else
-    vim.cmd 'terminal'
+    -- On Unix/macOS, just launch the default terminal; forward any extra arguments:
+    if #args.fargs > 0 then
+      vim.cmd('terminal ' .. table.concat(args.fargs, ' '))
+    else
+      vim.cmd 'terminal'
+    end
   end
 end
 
