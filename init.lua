@@ -1026,5 +1026,46 @@ if vim.fn.exists '$ConEmuANSI' == 1 then
   vim.o.termguicolors = true
 end
 
--- The line beneath this is called `modeline`. See `:help modeline`
--- vim: ts=2 sts=2 sw=2 et
+-- Julle TermHere command
+local function term_here(args)
+  -- Try to get the full path of the current buffer:
+  local cur_path = vim.api.nvim_buf_get_name(0)
+  local bufdir = ''
+
+  if cur_path ~= '' then
+    -- Current buffer has a file: use its directory
+    bufdir = vim.fn.fnamemodify(cur_path, ':h')
+  else
+    -- Current buffer is empty: try to find the alternate buffer (#
+    local alt_buf = vim.fn.bufnr '#'
+    if alt_buf ~= 0 then
+      local alt_name = vim.api.nvim_buf_get_name(alt_buf)
+      if alt_name ~= '' then
+        bufdir = vim.fn.fnamemodify(alt_name, ':h')
+      end
+    end
+  end
+
+  -- If we still have no directory, fall back to cwd (or empty string)
+  if bufdir == '' then
+    bufdir = vim.loop.cwd() or ''
+  end
+
+  -- Notify so you see exactly where we’re opening the terminal:
+  vim.notify('Opening terminal in: ' .. bufdir)
+
+  -- Change the window-local directory to bufdir
+  vim.cmd('lcd ' .. vim.fn.fnameescape(bufdir))
+
+  -- Finally, launch :terminal (forward any extra arguments)
+  if #args.fargs > 0 then
+    vim.cmd('terminal ' .. table.concat(args.fargs, ' '))
+  else
+    vim.cmd 'terminal'
+  end
+end
+
+vim.api.nvim_create_user_command('TermHere', term_here, {
+  nargs = '*',
+  bang = true,
+})
