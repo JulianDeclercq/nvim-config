@@ -1,7 +1,7 @@
 -- ~/.config/nvim/ftplugin/markdown.lua
 
 -- Set conceallevel for prettier Markdown (hides Obsidian-style link brackets, etc.)
-vim.wo.conceallevel = 2
+vim.wo.conceallevel = 0 -- testing this atm
 vim.wo.concealcursor = 'nc'
 
 -- Use two-space indentation for lists

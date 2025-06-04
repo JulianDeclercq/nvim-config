@@ -148,6 +148,10 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 vim.keymap.set('n', '<leader>w', '<C-w>', { noremap = true, silent = true, desc = 'Window command prefix' })
 -- visual mode
 vim.keymap.set('v', '<leader>w', '<C-w>', { noremap = true, silent = true, desc = 'Window command prefix (visual)' })
+-- open oldfiles in Telescope
+vim.keymap.set('n', '<leader>of', "<cmd>lua require('telescope.builtin').oldfiles()<CR>", { noremap = true, silent = true })
+-- obsidian keybinds
+--vim.
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`

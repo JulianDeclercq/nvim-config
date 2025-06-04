@@ -5,13 +5,13 @@ local obsidian_path
 if vim.fn.has 'macunix' == 1 then
   obsidian_path = '/Users/Julian/Repositories/obsidian'
 elseif vim.fn.has 'win32' == 1 then
-  obsidian_path = 'C:\\Users\\Julian\\Repositories\\obsidian'
+  obsidian_path = 'C:\\Users\\Julian\\Documents\\The Cache'
 else
   obsidian_path = vim.fn.expand '~' .. '/Repositories/obsidian'
 end
 
 -- File name override, default for this plugin is a Zettelkasten id, I don't like it
-local fileNameFunction = function(title)
+local noteIdFunction = function(title)
   local name = title:gsub('[\\/:*?"<>|]', '') -- trim illegal characters
   name = name:match '^%s*(.-)%s*$' -- trim leading and trailing whitespace
 
@@ -29,25 +29,6 @@ local fileNameFunction = function(title)
   end
 
   return candidate
-end
-
--- Generate id like the default. `note_id_func` overrides both title and id so let's pass this to still keep the id
-local function generate_id()
-  local ts = tostring(os.time()) -- e.g. "1749041682"
-  local random_suffix = {}
-  for i = 1, 4 do
-    -- pick a random uppercase letter A–Z
-    random_suffix[i] = string.char(math.random(65, 90))
-  end
-  return ts .. '-' .. table.concat(random_suffix) -- e.g. "1749041682-XQJF"
-end
-
-local noteFrontmatterFunction = function(note)
-  return {
-    id = generate_id(),
-    aliases = { note.title },
-    tags = {},
-  }
 end
 
 return {
@@ -69,8 +50,11 @@ return {
         path = obsidian_path,
       },
     },
-    note_id_func = fileNameFunction,
-    note_frontmatter_func = noteFrontmatterFunction,
+    note_id_func = noteIdFunction,
+    follow_url_func = function(url)
+      -- Open the URL in the default web browser.
+      vim.ui.open(url)
+    end,
     completion = {
       nvim_cmp = true,
       min_chars = 2,
@@ -79,6 +63,9 @@ return {
       --  * "notes_subdir" - put new notes in the default notes subdirectory.
       new_notes_location = 'notes_subdir',
       file_popup = true,
+    },
+    ui = {
+      enable = false,
     },
   },
 }
