@@ -186,7 +186,14 @@ vim.opt.rtp:prepend(lazypath)
 --    :Lazy update
 --
 -- NOTE: Here is where you install your plugins.
+-- Uncomment the following line once all plugins are in the plugins folder rather than here in the config
+-- Point Lazy to load **every** file under lua/plugins/*.lua
+-- require("lazy").setup("plugins")
 require('lazy').setup({
+  -- Point Lazy to load every file under lua/plugins/*.lua
+  -- TODO: Remove once all plugins have been moved to this folder
+  { import = 'plugins' },
+
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
