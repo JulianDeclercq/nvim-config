@@ -37,6 +37,23 @@ return {
   lazy = true,
   event = 'VimEnter', -- load on startup (no file)…, looks like this also works if you do any file so it's kind of pointless for me at the moment, need to figure out why this is or if there's another solution
   ft = 'markdown', -- …or on any markdown buffer
+  keys = {
+    {
+      '<leader>on',
+      '<Cmd>ObsidianNew<CR>',
+      desc = 'Obsidian: [N]ew Note',
+    },
+    {
+      '<leader>of',
+      '<Cmd>ObsidianFollowLink<CR>',
+      desc = 'Obsidian: [F]ollow Link',
+    },
+    {
+      '<leader>oqs',
+      '<Cmd>ObsidianQuickSwitch<CR>',
+      desc = 'Obsidian: [Q]uick [S]witch',
+    },
+  },
 
   dependencies = {
     'nvim-lua/plenary.nvim',
