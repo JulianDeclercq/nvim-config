@@ -55,13 +55,13 @@ return {
       -- Open the URL in the default web browser.
       vim.ui.open(url)
     end,
+    -- Where to put new notes. Valid options are
+    --  * "current_dir" - put new notes in same directory as the current buffer.
+    --  * "notes_subdir" - put new notes in the default notes subdirectory.
+    new_notes_location = 'notes_subdir',
     completion = {
       nvim_cmp = true,
       min_chars = 2,
-      -- Where to put new notes. Valid options are
-      --  * "current_dir" - put new notes in same directory as the current buffer.
-      --  * "notes_subdir" - put new notes in the default notes subdirectory.
-      new_notes_location = 'notes_subdir',
       file_popup = true,
     },
     ui = {
