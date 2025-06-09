@@ -53,6 +53,16 @@ return {
       '<Cmd>ObsidianQuickSwitch<CR>',
       desc = 'Obsidian: [Q]uick [S]witch',
     },
+    {
+      '<leader>os',
+      '<Cmd>ObsidianSearch<CR>',
+      desc = 'Obsidian: [S]earch',
+    },
+    {
+      '<leader>oo',
+      '<Cmd>ObsidianOpen<CR>',
+      desc = 'Obsidian: [O]pen',
+    },
   },
 
   dependencies = {

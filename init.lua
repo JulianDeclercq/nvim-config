@@ -39,6 +39,7 @@ vim.g.have_nerd_font = true
 
 -- Make line numbers default
 vim.opt.number = true
+
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
 vim.opt.relativenumber = true
@@ -978,9 +979,7 @@ require('lazy').setup({
   },
 })
 
-if vim.fn.exists '$ConEmuANSI' == 1 then
-  vim.o.termguicolors = true
-end
+vim.o.termguicolors = true
 
 -- Julle TermHere command
 local function term_here(args)
