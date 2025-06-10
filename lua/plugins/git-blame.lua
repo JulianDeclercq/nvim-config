@@ -2,7 +2,7 @@ return {
   'f-person/git-blame.nvim',
   event = 'VeryLazy',
   opts = {
-    enabled = true,
+    enabled = false, -- disable by default
     message_template = ' <summary> * <date> * <author> * <<sha>> ',
     date_format = '%d-%m-%Y',
   },
