@@ -85,4 +85,3 @@ return { -- Fuzzy Finder (files, lsp, etc)
     end, { desc = '[F]ind [N]eovim files' })
   end,
 }
-

@@ -44,9 +44,9 @@ return {
       desc = 'Obsidian: [N]ew Note',
     },
     {
-      '<leader>of',
+      '<leader>ol',
       '<Cmd>ObsidianFollowLink<CR>',
-      desc = 'Obsidian: [F]ollow Link',
+      desc = 'Obsidian: Follow [L]ink',
     },
     {
       '<leader>oqs',
