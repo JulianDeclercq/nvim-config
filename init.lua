@@ -129,11 +129,17 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 -- or just use <C-\><C-n> to exit terminal mode
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
--- Julle: Map <leader>W to <C-w> (window command mode) every standard window command still works. Set `remap` to true to allow whichfolke/which-key to show the overlay
+-- Julle: Map <leader>W to <C-w> (window command mode) every standard window command still works.
 -- normal mode
 vim.keymap.set('n', '<leader>w', '<C-w>', { noremap = true, silent = true, desc = 'Window command prefix' })
 -- visual mode
 vim.keymap.set('v', '<leader>w', '<C-w>', { noremap = true, silent = true, desc = 'Window command prefix (visual)' })
+
+-- window navigation with 1 less keystroke :)
+vim.keymap.set('n', '<leader>h', '<C-w>h', { desc = 'Go to left window' })
+vim.keymap.set('n', '<leader>j', '<C-w>j', { desc = 'Go to lower window' })
+vim.keymap.set('n', '<leader>k', '<C-w>k', { desc = 'Go to upper window' })
+vim.keymap.set('n', '<leader>l', '<C-w>l', { desc = 'Go to right window' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
