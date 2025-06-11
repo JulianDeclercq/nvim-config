@@ -84,7 +84,7 @@ vim.opt.splitbelow = true
 -- Sets how neovim will display certain whitespace characters in the editor.
 --  See `:help 'list'`
 --  and `:help 'listchars'`
-vim.opt.list = true
+vim.opt.list = false
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
 -- Preview substitutions live, as you type!
@@ -135,7 +135,12 @@ vim.keymap.set('n', '<leader>w', '<C-w>', { noremap = true, silent = true, desc 
 -- visual mode
 vim.keymap.set('v', '<leader>w', '<C-w>', { noremap = true, silent = true, desc = 'Window command prefix (visual)' })
 -- open oldfiles in Telescope
-vim.keymap.set('n', '<leader>of', "<cmd>lua require('telescope.builtin').oldfiles()<CR>", { noremap = true, silent = true })
+vim.keymap.set(
+  'n',
+  '<leader>tof',
+  "<cmd>lua require('telescope.builtin').oldfiles()<CR>",
+  { noremap = true, silent = true, desc = '[T]elescope [O]ld [F]iles' }
+)
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -512,9 +517,7 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
-        -- ts_ls = {},
-        --
-
+        ts_ls = {},
         lua_ls = {
           -- cmd = { ... },
           -- filetypes = { ... },
@@ -667,7 +670,7 @@ require('lazy').setup({
         -- <c-k>: Toggle signature help
         --
         -- See :h blink-cmp-config-keymap for defining your own keymap
-        preset = 'default',
+        preset = 'super-tab',
 
         -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
         --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps

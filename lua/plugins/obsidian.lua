@@ -41,27 +41,27 @@ return {
     {
       '<leader>on',
       '<Cmd>ObsidianNew<CR>',
-      desc = 'Obsidian: [N]ew Note',
+      desc = '[O]bsidian: [N]ew Note',
     },
     {
       '<leader>ol',
       '<Cmd>ObsidianFollowLink<CR>',
-      desc = 'Obsidian: Follow [L]ink',
+      desc = '[O]bsidian: Follow [L]ink',
     },
     {
       '<leader>oqs',
       '<Cmd>ObsidianQuickSwitch<CR>',
-      desc = 'Obsidian: [Q]uick [S]witch',
+      desc = '[O]bsidian: [Q]uick [S]witch',
     },
     {
       '<leader>os',
       '<Cmd>ObsidianSearch<CR>',
-      desc = 'Obsidian: [S]earch',
+      desc = '[O]bsidian: [F]ind',
     },
     {
       '<leader>oo',
       '<Cmd>ObsidianOpen<CR>',
-      desc = 'Obsidian: [O]pen',
+      desc = '[O]bsidian: [O]pen',
     },
   },
 
