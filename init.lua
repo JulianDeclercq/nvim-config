@@ -134,13 +134,6 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 vim.keymap.set('n', '<leader>w', '<C-w>', { noremap = true, silent = true, desc = 'Window command prefix' })
 -- visual mode
 vim.keymap.set('v', '<leader>w', '<C-w>', { noremap = true, silent = true, desc = 'Window command prefix (visual)' })
--- open oldfiles in Telescope
-vim.keymap.set(
-  'n',
-  '<leader>tof',
-  "<cmd>lua require('telescope.builtin').oldfiles()<CR>",
-  { noremap = true, silent = true, desc = '[T]elescope [O]ld [F]iles' }
-)
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -377,7 +370,7 @@ require('lazy').setup({
 
           -- Execute a code action, usually your cursor needs to be on top of an error
           -- or a suggestion from your LSP for this to activate.
-          map('<leader>ra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
+          map('<leader>ca', vim.lsp.buf.code_action, 'Goto [C]ode [A]ction', { 'n', 'x' })
 
           -- Find references for the word under your cursor.
           map('<leader>gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
@@ -518,6 +511,12 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         ts_ls = {},
+        csharp_ls = {},
+        cssls = {},
+        cssmodules_ls = {
+          filetypes = { 'css', 'scss', 'sass', 'less' },
+        },
+        css_variables = {},
         lua_ls = {
           -- cmd = { ... },
           -- filetypes = { ... },
@@ -845,8 +844,8 @@ require('lazy').setup({
   --
   -- require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
-  -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
+  require 'kickstart.plugins.lint',
+  require 'kickstart.plugins.autopairs',
   -- require 'kickstart.plugins.neo-tree',
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 

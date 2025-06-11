@@ -54,7 +54,7 @@ return {
       desc = '[O]bsidian: [Q]uick [S]witch',
     },
     {
-      '<leader>os',
+      '<leader>of',
       '<Cmd>ObsidianSearch<CR>',
       desc = '[O]bsidian: [F]ind',
     },
