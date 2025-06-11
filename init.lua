@@ -138,7 +138,7 @@ vim.keymap.set('v', '<leader>w', '<C-w>', { noremap = true, silent = true, desc 
 -- window navigation with 1 less keystroke :)
 vim.keymap.set('n', '<leader>h', '<C-w>h', { desc = 'Go to left window' })
 vim.keymap.set('n', '<leader>j', '<C-w>j', { desc = 'Go to lower window' })
-vim.keymap.set('n', '<leader>k', '<C-w>k', { desc = 'Go to upper window' })
+-- vim.keymap.set('n', '<leader>k', '<C-w>k', { desc = 'Go to upper window' }) -- commented since I want to use it for hover info for now
 vim.keymap.set('n', '<leader>l', '<C-w>l', { desc = 'Go to right window' })
 
 -- [[ Basic Autocommands ]]
@@ -377,6 +377,9 @@ require('lazy').setup({
           -- Execute a code action, usually your cursor needs to be on top of an error
           -- or a suggestion from your LSP for this to activate.
           map('<leader>ca', vim.lsp.buf.code_action, 'Goto [C]ode [A]ction', { 'n', 'x' })
+
+          -- Julle, show hover info
+          map('<leader>k', vim.lsp.buf.hover, 'Hover Info')
 
           -- Find references for the word under your cursor.
           map('<leader>gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
