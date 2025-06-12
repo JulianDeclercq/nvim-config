@@ -594,6 +594,7 @@ require('lazy').setup({
     },
     opts = {
       notify_on_error = false,
+
       format_on_save = function(bufnr)
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
@@ -608,6 +609,7 @@ require('lazy').setup({
           }
         end
       end,
+
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
@@ -615,10 +617,19 @@ require('lazy').setup({
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
         -- javascript = { "prettierd", "prettier", stop_after_first = true },
+
+        html = { 'prettier' },
+        javascript = { 'prettier' },
+        typescript = { 'prettier' },
+        typescriptreact = { 'prettier' },
+        json = { 'prettier' },
+        css = { 'prettier' },
+        markdown = { 'prettier' },
+
+        ['*'] = { 'trim_whitespace' },
       },
     },
   },
-
   { -- Autocompletion
     'saghen/blink.cmp',
     build = 'cargo +nightly build --release',
