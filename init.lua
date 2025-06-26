@@ -101,6 +101,9 @@ vim.opt.scrolloff = 10
 -- See `:help 'confirm'`
 vim.opt.confirm = true
 
+-- Ensure OmniSharp locates the .NET SDK on Apple Silicon by setting DOTNET_ROOT
+vim.env.DOTNET_ROOT = '/usr/local/share/dotnet'
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 vim.api.nvim_create_user_command('PwdCopy', function()
@@ -120,7 +123,7 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
-vim.keymap.set('n', '<leader>dk', vim.diagnostic.open_float, { desc = 'Open [D]iagnostic float' })
+vim.keymap.set('n', '<leader>k', vim.diagnostic.open_float, { desc = 'Open [D]iagnostic float' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -379,8 +382,8 @@ require('lazy').setup({
           -- or a suggestion from your LSP for this to activate.
           map('<leader>ca', vim.lsp.buf.code_action, 'Goto [C]ode [A]ction', { 'n', 'x' })
 
-          -- Julle, show hover info
-          map('<leader>k', vim.lsp.buf.hover, 'Hover Info')
+          -- Show hover info
+          map('<leader>K', vim.lsp.buf.hover, 'Hover Info')
 
           -- Find references for the word under your cursor.
           map('<leader>gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
@@ -521,7 +524,8 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         ts_ls = {},
-        csharp_ls = {},
+        -- csharp_ls = {}, -- worked great, but use omnisharp instead since it gives you the same formatting engine as Rider under the hood
+        omnisharp = {},
         cssls = {},
         cssmodules_ls = {
           filetypes = { 'css', 'scss', 'sass', 'less' },
@@ -565,6 +569,7 @@ require('lazy').setup({
       require('mason-lspconfig').setup {
         ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
         automatic_installation = false,
+        automatic_enable = true,
         handlers = {
           function(server_name)
             local server = servers[server_name] or {}
@@ -587,7 +592,7 @@ require('lazy').setup({
       {
         '<leader>f',
         function()
-          require('conform').format { async = true, lsp_format = 'fallback' }
+          require('conform').format { async = true } --, lsp_format = 'fallback' }
         end,
         mode = '',
         desc = '[F]ormat buffer',
@@ -613,6 +618,10 @@ require('lazy').setup({
 
       formatters_by_ft = {
         lua = { 'stylua' },
+        cs = {
+          lsp_format = true, -- let lsp (OmniSharp) handle the formatting when `:Conform` or `<leader>f` since it's great
+          stop_after_first = true,
+        },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
@@ -870,6 +879,7 @@ require('lazy').setup({
   require 'kickstart.plugins.autopairs',
   -- require 'kickstart.plugins.neo-tree',
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+  --
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.

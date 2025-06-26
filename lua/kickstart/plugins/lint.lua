@@ -36,7 +36,7 @@ return {
         html = { 'eslint', 'stylelint' },
 
         -- Lua
-        lua = { 'luacheck' },
+        -- lua = { 'luacheck' },
       }
 
       -- lint on save
