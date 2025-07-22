@@ -121,29 +121,29 @@ end, { desc = 'Format stack trace: newline before each "at"' })
 --  See `:help hlsearch`
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
--- Diagnostic keymaps
--- loc list is for the current file, not workspace wise, let's keep it commented for now
--- vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+-- Diagnostic keymaps, using telescope
+-- Diagnostic keymaps, using Telescope’s built‑in diagnostics picker
 vim.keymap.set('n', '<leader>da', function()
-  vim.diagnostic.setqflist()
-  vim.cmd 'copen'
+  require('telescope.builtin').diagnostics {
+    prompt_title = 'Diagnostics - All',
+  }
 end, { desc = '[D]iagnostics [A]ll' })
 
 vim.keymap.set('n', '<leader>de', function()
-  vim.diagnostic.setqflist {
+  require('telescope.builtin').diagnostics {
+    prompt_title = 'Diagnostics - Errors',
     severity = vim.diagnostic.severity.ERROR,
   }
-  vim.cmd 'copen'
 end, { desc = '[D]iagnostics [E]rrors' })
 
 vim.keymap.set('n', '<leader>dw', function()
-  vim.diagnostic.setqflist {
+  require('telescope.builtin').diagnostics {
+    prompt_title = 'Diagnostics - Warnings',
     severity = vim.diagnostic.severity.WARN,
   }
-  vim.cmd 'copen'
 end, { desc = '[D]iagnostics [W]arnings' })
 
-vim.keymap.set('n', '<leader>k', vim.diagnostic.open_float, { desc = 'Open [D]iagnostic float' })
+vim.keymap.set('n', '<leader>K', vim.diagnostic.open_float, { desc = 'Open [D]iagnostic float' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -403,7 +403,7 @@ require('lazy').setup({
           map('<leader>ca', vim.lsp.buf.code_action, 'Goto [C]ode [A]ction', { 'n', 'x' })
 
           -- Show hover info
-          map('<leader>K', vim.lsp.buf.hover, 'Hover Info')
+          map('<leader>k', vim.lsp.buf.hover, 'Hover Info')
 
           -- Find references for the word under your cursor.
           map('<leader>gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
