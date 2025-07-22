@@ -122,7 +122,27 @@ end, { desc = 'Format stack trace: newline before each "at"' })
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
 -- Diagnostic keymaps
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+-- loc list is for the current file, not workspace wise, let's keep it commented for now
+-- vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+vim.keymap.set('n', '<leader>da', function()
+  vim.diagnostic.setqflist()
+  vim.cmd 'copen'
+end, { desc = '[D]iagnostics [A]ll' })
+
+vim.keymap.set('n', '<leader>de', function()
+  vim.diagnostic.setqflist {
+    severity = vim.diagnostic.severity.ERROR,
+  }
+  vim.cmd 'copen'
+end, { desc = '[D]iagnostics [E]rrors' })
+
+vim.keymap.set('n', '<leader>dw', function()
+  vim.diagnostic.setqflist {
+    severity = vim.diagnostic.severity.WARN,
+  }
+  vim.cmd 'copen'
+end, { desc = '[D]iagnostics [W]arnings' })
+
 vim.keymap.set('n', '<leader>k', vim.diagnostic.open_float, { desc = 'Open [D]iagnostic float' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
@@ -389,7 +409,6 @@ require('lazy').setup({
           map('<leader>gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
 
           -- Jump to the implementation of the word under your cursor.
-          --  Useful when your language has ways of declaring types without an actual implementation.
           map('<leader>gi', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
 
           -- Jump to the definition of the word under your cursor.
