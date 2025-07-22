@@ -121,13 +121,13 @@ end, { desc = 'Format stack trace: newline before each "at"' })
 --  See `:help hlsearch`
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
--- Diagnostic keymaps, using telescope
--- Diagnostic keymaps, using Telescope’s built‑in diagnostics picker
+-- Diagnostic keymaps
+-- Telescope’s built‑in diagnostics picker
 vim.keymap.set('n', '<leader>da', function()
   require('telescope.builtin').diagnostics {
-    prompt_title = 'Diagnostics - All',
+    prompt_title = 'Diagnostics - Any',
   }
-end, { desc = '[D]iagnostics [A]ll' })
+end, { desc = '[D]iagnostics [A]ny' })
 
 vim.keymap.set('n', '<leader>de', function()
   require('telescope.builtin').diagnostics {
@@ -142,6 +142,47 @@ vim.keymap.set('n', '<leader>dw', function()
     severity = vim.diagnostic.severity.WARN,
   }
 end, { desc = '[D]iagnostics [W]arnings' })
+
+-- next and previous
+vim.keymap.set('n', '<leader>dna', function()
+  vim.diagnostic.jump {
+    count = 1,
+  }
+end, { desc = '[D]iagnostics [N]ext [A]ny' })
+
+vim.keymap.set('n', '<leader>dpa', function()
+  vim.diagnostic.jump {
+    count = -1,
+  }
+end, { desc = '[D]iagnostics [P]revious [A]ny' })
+
+vim.keymap.set('n', '<leader>dne', function()
+  vim.diagnostic.jump {
+    count = 1,
+    severity = vim.diagnostic.severity.ERROR,
+  }
+end, { desc = '[D]iagnostics [N]ext [E]rror' })
+
+vim.keymap.set('n', '<leader>dpe', function()
+  vim.diagnostic.jump {
+    count = -1,
+    severity = vim.diagnostic.severity.ERROR,
+  }
+end, { desc = '[D]iagnostics [P]revious [E]rror' })
+
+vim.keymap.set('n', '<leader>dnw', function()
+  vim.diagnostic.jump {
+    count = 1,
+    severity = vim.diagnostic.severity.WARN,
+  }
+end, { desc = '[D]iagnostics [N]ext [W]arning' })
+
+vim.keymap.set('n', '<leader>dpw', function()
+  vim.diagnostic.jump {
+    count = -1,
+    severity = vim.diagnostic.severity.WARN,
+  }
+end, { desc = '[D]iagnostics [P]revious [W]arning' })
 
 vim.keymap.set('n', '<leader>K', vim.diagnostic.open_float, { desc = 'Open [D]iagnostic float' })
 
@@ -878,7 +919,8 @@ require('lazy').setup({
     ---@module "neo-tree"
     ---@type neotree.Config?
     keys = {
-      { '<leader>nt', '<cmd>Neotree toggle<CR>', desc = 'NeoTree toggle', silent = true },
+      { '<leader>nt', '<cmd>Neotree toggle<CR>', desc = '[N]eoTree [T]oggle', silent = true },
+      { '<leader>ntr', '<cmd>Neotree reveal<CR>', desc = '[N]eoTree [R]eveal', silent = true },
     },
     opts = {},
   },
