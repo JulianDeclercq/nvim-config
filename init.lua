@@ -877,9 +877,10 @@ require('lazy').setup({
     lazy = false, -- neo-tree will lazily load itself
     ---@module "neo-tree"
     ---@type neotree.Config?
-    opts = {
-      -- fill any relevant options here
+    keys = {
+      { '<leader>nt', '<cmd>Neotree toggle<CR>', desc = 'NeoTree toggle', silent = true },
     },
+    opts = {},
   },
 
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
@@ -998,4 +999,49 @@ end
 vim.api.nvim_create_user_command('TermHere', term_here, {
   nargs = '*',
   bang = true,
+})
+
+-- Set tab title to current buffer's path
+vim.o.title = true
+
+-- helper: grab first n folders, then file
+local function first_n_folders_with_file(n)
+  local full = vim.fn.expand '%:p' -- e.g. "/home/user/projects/foo/src/bar.lua"
+  if full == '' then
+    return ''
+  end
+
+  local dir = vim.fn.fnamemodify(full, ':h') -- "/home/user/projects/foo/src"
+  local stripped = dir:gsub('^/', '') -- "home/user/projects/foo/src"
+  stripped = stripped:gsub('^Users/Julian/', '') -- remove prefix on MacOS
+  stripped = stripped:gsub('^Repositories/', '')
+  local parts = vim.split(stripped, '/', { plain = true })
+
+  -- take up to n of them
+  local sel = {}
+  for i = 1, math.min(n, #parts) do
+    sel[#sel + 1] = parts[i]
+  end
+
+  -- re­assemble
+  local title = '/' .. table.concat(sel, '/') -- "/home/user/projects"
+  local filename = vim.fn.expand '%:t' -- "bar.lua"
+
+  if #parts > n then
+    title = title .. '/.../' .. filename -- "/home/user/projects/.../bar.lua"
+  else
+    title = title .. '/' .. filename -- shallow: "/home/user/projects/bar.lua"
+  end
+
+  return title
+end
+
+-- set it initially
+vim.o.titlestring = first_n_folders_with_file(3)
+
+-- refresh on buffer/tab switch
+vim.api.nvim_create_autocmd({ 'BufEnter', 'TabEnter' }, {
+  callback = function()
+    vim.opt.titlestring = first_n_folders_with_file(3)
+  end,
 })
