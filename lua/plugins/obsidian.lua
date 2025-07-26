@@ -63,11 +63,23 @@ return {
       '<Cmd>ObsidianOpen<CR>',
       desc = '[O]bsidian: [O]pen',
     },
+    {
+      '<leader>os',
+      function()
+        require('telescope.builtin').find_files {
+          cwd = obsidian_path .. '/.obsidian/snippets',
+          hidden = true,
+          prompt_title = 'Obsidian Snippets',
+        }
+      end,
+      desc = '[O]bsidian: [S]nippets',
+    },
   },
 
   dependencies = {
     'nvim-lua/plenary.nvim',
     'hrsh7th/nvim-cmp', -- autocomplete for note references
+    'nvim-telescope/telescope.nvim', -- for snippet search
   },
 
   opts = {
