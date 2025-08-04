@@ -1087,3 +1087,7 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'TabEnter' }, {
     vim.opt.titlestring = first_n_folders_with_file(3)
   end,
 })
+
+-- remove automatic commenting after a comment
+vim.opt.formatoptions:remove 'r'
+vim.opt.formatoptions:remove 'o'
