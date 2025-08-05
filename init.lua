@@ -1,128 +1,38 @@
---[[
-    If you don't know anything about Lua, I recommend taking some time to read through
-    a guide. One possible example which will only take 10-15 minutes:
-      - https://learnxinyminutes.com/docs/lua/
-
-    After understanding a bit more about Lua, you can use `:help lua-guide` as a
-    reference for how Neovim integrates Lua.
-    - :help lua-guide
-    - (or HTML version): https://neovim.io/doc/user/lua-guide.html
-
-Kickstart Guide:
-  TODO: The very first thing you should do is to run the command `:Tutor` in Neovim.
-  Next, run AND READ `:help`.
-    This will open up a help window with some basic information
-    about reading, navigating and searching the builtin help documentation.
-
-    This should be the first place you go to look when you're stuck or confused
-    with something. It's one of my favorite Neovim features.
-
-    MOST IMPORTANTLY, we provide a keymap "<space>sh" to [s]earch the [h]elp documentation,
-    which is very useful when you're not exactly sure of what you're looking for.
-
-If you experience any errors while trying to install kickstart, run `:checkhealth` for more info.
---]]
-
--- Set <space> as the leader key
--- See `:help mapleader`
---  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
-
--- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
-
--- [[ Setting options ]]
--- See `:help vim.opt`
--- NOTE: You can change these options as you wish!
---  For more options, you can see `:help option-list`
-
--- Make line numbers default
 vim.opt.number = true
-
--- You can also add relative line numbers, to help with jumping.
---  Experiment for yourself to see if you like it!
 vim.opt.relativenumber = true
-
--- Enable mouse mode, can be useful for resizing splits for example!
-vim.opt.mouse = 'a'
-
--- Don't show the mode, since it's already in the status line
-vim.opt.showmode = false
-
--- Sync clipboard between OS and Neovim.
---  Schedule the setting after `UiEnter` because it can increase startup-time.
---  Remove this option if you want your OS clipboard to remain independent.
---  See `:help 'clipboard'`
-vim.schedule(function()
+vim.opt.mouse = 'a' -- Enable mouse mode, can be useful for resizing splits for example!
+vim.opt.showmode = false -- Don't show the mode, since it's already in the status line
+vim.schedule(function() -- Sync clipboard between OS and Neovim. Schedule the setting after `UiEnter` because it can increase startup-time.
   vim.opt.clipboard = 'unnamedplus'
 end)
 
--- Enable break indent
 vim.opt.breakindent = true
-
--- Save undo history
 vim.opt.undofile = true
-
--- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
-vim.opt.ignorecase = true
-vim.opt.smartcase = true
-
--- Keep signcolumn on by default
+vim.opt.ignorecase = true -- Ignore case in searches
+vim.opt.smartcase = true -- Re-enable case in searches if the search contains \C or one or more capital letters in the search term
 vim.opt.signcolumn = 'yes'
-
--- Decrease update time
 vim.opt.updatetime = 250
-
--- Decrease mapped sequence wait time
 vim.opt.timeoutlen = 300
-
--- Configure how new splits should be opened
 vim.opt.splitright = true
 vim.opt.splitbelow = true
-
--- Sets how neovim will display certain whitespace characters in the editor.
---  See `:help 'list'`
---  and `:help 'listchars'`
 vim.opt.list = false
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
-
--- Preview substitutions live, as you type!
-vim.opt.inccommand = 'split'
-
--- Show which line your cursor is on
+vim.opt.inccommand = 'split' -- Preview substitutions live, as you type!
 vim.opt.cursorline = true
-
--- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
-
--- if performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
--- instead raise a dialog asking if you wish to save the current file(s)
--- See `:help 'confirm'`
-vim.opt.confirm = true
-
--- Ensure OmniSharp locates the .NET SDK on Apple Silicon by setting DOTNET_ROOT
-vim.env.DOTNET_ROOT = '/usr/local/share/dotnet'
-
--- [[ Basic Keymaps ]]
---  See `:help vim.keymap.set()`
-vim.api.nvim_create_user_command('PwdCopy', function()
-  local dir = vim.fn.expand '%:p:h'
-  vim.fn.setreg('+', dir)
-  vim.notify('Copied to clipboard: ' .. dir, vim.log.levels.INFO, { title = 'PwdCopy' })
-end, { desc = 'Copy current buffer directory to clipboard' })
-
-vim.api.nvim_create_user_command('StackTraceFmt', function()
-  -- Substitute over the whole buffer: insert a newline before each "at"
-  vim.cmd [[%s/\<at\>/\rat/g]]
-end, { desc = 'Format stack trace: newline before each "at"' })
+vim.opt.confirm = true -- If performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
+vim.env.DOTNET_ROOT = '/usr/local/share/dotnet' -- Ensure OmniSharp locates the .NET SDK on Apple Silicon by setting DOTNET_ROOT
 
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
--- Diagnostic keymaps
--- Telescope’s built‑in diagnostics picker
+-- Diagnostic keymaps, use Telescope’s built‑in diagnostics picker
+vim.keymap.set('n', '<leader>K', vim.diagnostic.open_float, { desc = 'Open [D]iagnostic float' })
+
 vim.keymap.set('n', '<leader>da', function()
   require('telescope.builtin').diagnostics {
     prompt_title = 'Diagnostics - Any',
@@ -143,7 +53,7 @@ vim.keymap.set('n', '<leader>dw', function()
   }
 end, { desc = '[D]iagnostics [W]arnings' })
 
--- next and previous
+-- Next and previous diagnostics
 vim.keymap.set('n', '<leader>dna', function()
   vim.diagnostic.jump {
     count = 1,
@@ -184,20 +94,11 @@ vim.keymap.set('n', '<leader>dpw', function()
   }
 end, { desc = '[D]iagnostics [P]revious [W]arning' })
 
-vim.keymap.set('n', '<leader>K', vim.diagnostic.open_float, { desc = 'Open [D]iagnostic float' })
-
--- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
--- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
--- is not what someone will guess without a bit more experience.
---
--- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
--- or just use <C-\><C-n> to exit terminal mode
+-- Exit terminal mode in the builtin terminal with a shortcut instead of <C-\><C-n>
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
--- Julle: Map <leader>W to <C-w> (window command mode) every standard window command still works.
--- normal mode
+-- Map <leader>W to <C-w> (window command mode) every standard window command still works.
 vim.keymap.set('n', '<leader>w', '<C-w>', { noremap = true, silent = true, desc = 'Window command prefix' })
--- visual mode
 vim.keymap.set('v', '<leader>w', '<C-w>', { noremap = true, silent = true, desc = 'Window command prefix (visual)' })
 
 -- window navigation with 1 less keystroke :)
@@ -206,12 +107,7 @@ vim.keymap.set('n', '<leader>j', '<C-w>j', { desc = 'Go to lower window' })
 -- vim.keymap.set('n', '<leader>k', '<C-w>k', { desc = 'Go to upper window' }) -- commented since I want to use it for hover info for now
 vim.keymap.set('n', '<leader>l', '<C-w>l', { desc = 'Go to right window' })
 
--- [[ Basic Autocommands ]]
---  See `:help lua-guide-autocommands`
-
 -- Highlight when yanking (copying) text
---  Try it with `yap` in normal mode
---  See `:help vim.highlight.on_yank()`
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
@@ -232,50 +128,11 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
--- [[ Configure and install plugins ]]
---
---  To check the current status of your plugins, run
---    :Lazy
---
---  You can press `?` in this menu for help. Use `:q` to close the window
---
---  To update plugins you can run
---    :Lazy update
---
--- NOTE: Here is where you install your plugins.
--- Uncomment the following line once all plugins are in the plugins folder rather than here in the config
--- Point Lazy to load **every** file under lua/plugins/*.lua
--- require("lazy").setup("plugins")
 require('lazy').setup({
-  -- Point Lazy to load every file under lua/plugins/*.lua
-  -- TODO: Remove once all plugins have been moved to this folder
+  -- Point Lazy to load every file under lua/plugins/*.lua TODO: Remove once all plugins have been moved to this folder (?)
   { import = 'plugins' },
 
-  -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
-
-  -- NOTE: Plugins can also be added by using a table,
-  -- with the first argument being the link and the following
-  -- keys can be used to configure plugin behavior/loading/etc.
-  --
-  -- Use `opts = {}` to automatically pass options to a plugin's `setup()` function, forcing the plugin to be loaded.
-  --
-
-  -- Alternatively, use `config = function() ... end` for full control over the configuration.
-  -- If you prefer to call `setup` explicitly, use:
-  --    {
-  --        'lewis6991/gitsigns.nvim',
-  --        config = function()
-  --            require('gitsigns').setup({
-  --                -- Your gitsigns configuration here
-  --            })
-  --        end,
-  --    }
-  --
-  -- Here is a more advanced example where we pass configuration
-  -- options to `gitsigns.nvim`.
-  --
-  -- See `:help gitsigns` to understand what the configuration keys do
   { -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
     opts = {
@@ -288,33 +145,13 @@ require('lazy').setup({
       },
     },
   },
-
-  -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
-  --
-  -- This is often very useful to both group configuration, as well as handle
-  -- lazy loading plugins that don't need to be loaded immediately at startup.
-  --
-  -- For example, in the following configuration, we use:
-  --  event = 'VimEnter'
-  --
-  -- which loads which-key before all the UI elements are loaded. Events can be
-  -- normal autocommands events (`:help autocmd-events`).
-  --
-  -- Then, because we use the `opts` key (recommended), the configuration runs
-  -- after the plugin has been loaded as `require(MODULE).setup(opts)`.
-
-  { -- Useful plugin to show you pending keybinds.
-    'folke/which-key.nvim',
-    event = 'VimEnter', -- Sets the loading event to 'VimEnter'
+  {
+    'folke/which-key.nvim', -- Show pending keybinds
+    event = 'VimEnter',
     opts = {
-      -- delay between pressing a key and opening which-key (milliseconds)
-      -- this setting is independent of vim.opt.timeoutlen
-      delay = 0,
+      delay = 0, -- delay between pressing a key and opening which-key (milliseconds), this setting is independent of vim.opt.timeoutlen
       icons = {
-        -- set icon mappings to true if you have a Nerd Font
         mappings = vim.g.have_nerd_font,
-        -- If you are using a Nerd Font: set icons.keys to an empty table which will use the
-        -- default which-key.nvim defined Nerd Font icons, otherwise define a string table
         keys = vim.g.have_nerd_font and {} or {
           Up = '<Up> ',
           Down = '<Down> ',
@@ -347,50 +184,33 @@ require('lazy').setup({
         },
       },
 
-      -- Document existing key chains
-      spec = {
+      spec = { -- Document existing key chains
         { '<leader>s', group = '[S]earch' },
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
       },
     },
   },
-
-  -- NOTE: Plugins can specify dependencies.
-  --
-  -- The dependencies are proper plugin specifications as well - anything
-  -- you do for a plugin at the top level, you can do for a dependency.
-  --
-  -- Use the `dependencies` key to specify the dependencies of a particular plugin
-  -- LSP Plugins
   {
-    -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
-    -- used for completion, annotations and signatures of Neovim apis
+    -- configures Lua LSP for your Neovim config, runtime and plugins used for completion, annotations and signatures of Neovim apis
     'folke/lazydev.nvim',
     ft = 'lua',
     opts = {
       library = {
-        -- Load luvit types when the `vim.uv` word is found
-        { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+        { path = '${3rd}/luv/library', words = { 'vim%.uv' } }, -- Load luvit types when the `vim.uv` word is found
       },
     },
   },
   {
-    -- Main LSP Configuration
-    'neovim/nvim-lspconfig',
+    'neovim/nvim-lspconfig', -- Main LSP Configuration
     dependencies = {
-      -- Automatically install LSPs and related tools to stdpath for Neovim
-      -- Mason must be loaded before its dependents so we need to set it up here.
+      -- Automatically install LSPs and related tools to stdpath for Neovim. Mason must be loaded before its dependents so we need to set it up here.
       -- NOTE: `opts = {}` is the same as calling `require('mason').setup({})`
       { 'williamboman/mason.nvim', opts = {} },
       'williamboman/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
-
-      -- Useful status updates for LSP.
-      { 'j-hui/fidget.nvim', opts = {} },
-
-      -- Allows extra capabilities provided by blink.cmp
-      'saghen/blink.cmp',
+      { 'j-hui/fidget.nvim', opts = {} }, -- Useful status updates for LSP.
+      'saghen/blink.cmp', -- Allows extra capabilities provided by blink.cmp
     },
     config = function()
       -- Brief aside: **What is LSP?**
@@ -516,9 +336,7 @@ require('lazy').setup({
             })
           end
 
-          -- The following code creates a keymap to toggle inlay hints in your
-          -- code, if the language server you are using supports them
-          --
+          -- The following code creates a keymap to toggle inlay hints in your code, if the language server you are using supports them
           -- This may be unwanted, since they displace some of your code
           if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
             map('<leader>th', function()
@@ -660,11 +478,8 @@ require('lazy').setup({
     },
     opts = {
       notify_on_error = false,
-
       format_on_save = function(bufnr)
-        -- Disable "format_on_save lsp_fallback" for languages that don't
-        -- have a well standardized coding style. You can add additional
-        -- languages here or re-enable it for the disabled ones.
+        -- Disable "format_on_save lsp_fallback" for languages that don't have a well standardized coding style. You can add additional languages here or re-enable it for the disabled ones.
         local disable_filetypes = { c = true, cpp = true }
         if disable_filetypes[vim.bo[bufnr].filetype] then
           return nil
@@ -749,7 +564,7 @@ require('lazy').setup({
         -- For an understanding of why the 'default' preset is recommended,
         -- you will need to read `:help ins-completion`
         --
-        -- No, but seriously. Please read `:help ins-completion`, it is really good!
+        -- TODO No, but seriously. Please read `:help ins-completion`, it is really good!
         --
         -- All presets have the following mappings:
         -- <tab>/<s-tab>: move to right/left of your snippet expansion
@@ -759,15 +574,11 @@ require('lazy').setup({
         -- <c-k>: Toggle signature help
         --
         -- See :h blink-cmp-config-keymap for defining your own keymap
-        preset = 'super-tab',
-
-        -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
-        --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
+        preset = 'default',
       },
 
       appearance = {
-        -- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
-        -- Adjusts spacing to ensure icons are aligned
+        -- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'. Adjusts spacing to ensure icons are aligned
         nerd_font_variant = 'mono',
       },
 
@@ -1091,3 +902,15 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'TabEnter' }, {
 -- remove automatic commenting after a comment
 vim.opt.formatoptions:remove 'r'
 vim.opt.formatoptions:remove 'o'
+
+-- User commands
+vim.api.nvim_create_user_command('PwdCopy', function()
+  local dir = vim.fn.expand '%:p:h'
+  vim.fn.setreg('+', dir)
+  vim.notify('Copied to clipboard: ' .. dir, vim.log.levels.INFO, { title = 'PwdCopy' })
+end, { desc = 'Copy current buffer directory to clipboard' })
+
+vim.api.nvim_create_user_command('StackTraceFmt', function()
+  -- Substitute over the whole buffer: insert a newline before each "at"
+  vim.cmd [[%s/\<at\>/\rat/g]]
+end, { desc = 'Format stack trace: newline before each "at"' })
