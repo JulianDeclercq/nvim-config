@@ -610,7 +610,21 @@ require('lazy').setup({
       signature = { enabled = true },
     },
   },
-
+  { -- I don't really want to use nvim-cmp but obsidian for nvim uses this by default so let's just map the keymaps and call it a day
+    'hrsh7th/nvim-cmp',
+    event = 'InsertEnter', -- load on Insert mode
+    opts = function()
+      local cmp = require 'cmp'
+      return {
+        snippet = { expand = function(_) end }, -- we don’t use snippets here, so this can be a no-op
+        mapping = {
+          ['<C-n>'] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
+          ['<C-p>'] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
+          ['<C-y>'] = cmp.mapping.confirm { select = true },
+        },
+      }
+    end,
+  },
   { -- You can easily change to a different colorscheme.
     -- Change the name of the colorscheme plugin below, and then
     -- change the command in the config to whatever the name of that colorscheme is.
