@@ -574,7 +574,10 @@ require('lazy').setup({
         -- <c-k>: Toggle signature help
         --
         -- See :h blink-cmp-config-keymap for defining your own keymap
-        preset = 'default',
+        -- preset = 'default',
+
+        -- Julle: I just can't stand the keymap <C-y>, it's too clumsy. Having preset `enter` still allows you to cycle with <C-p> and <C-n>
+        preset = 'enter',
       },
 
       appearance = {
@@ -928,3 +931,34 @@ vim.api.nvim_create_user_command('StackTraceFmt', function()
   -- Substitute over the whole buffer: insert a newline before each "at"
   vim.cmd [[%s/\<at\>/\rat/g]]
 end, { desc = 'Format stack trace: newline before each "at"' })
+
+-- auto-read
+vim.opt.updatetime = 1000 -- fire CursorHold and CursorHoldI events after 1000ms instead of the default
+vim.o.autoread = true
+
+local auto_read = vim.api.nvim_create_augroup('AutoReadAll', { clear = true })
+vim.api.nvim_create_autocmd('FocusGained', {
+  group = auto_read,
+  pattern = '*',
+  command = "if getcmdwintype() == '' | checktime | endif",
+})
+vim.api.nvim_create_autocmd('BufEnter', {
+  group = auto_read,
+  pattern = '*',
+  command = "if &buftype == '' && !&modified && expand('%') != '' | exec 'checktime ' . expand('<abuf>') | endif",
+})
+
+-- auto-save
+vim.o.autowrite = true
+
+local auto_save = vim.api.nvim_create_augroup('AutoSaveAll', { clear = true })
+vim.api.nvim_create_autocmd({ 'BufLeave', 'FocusLost' }, {
+  group = auto_save,
+  pattern = '*',
+  command = 'silent! write',
+})
+vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
+  group = auto_save,
+  pattern = '*',
+  command = 'silent! write',
+})
