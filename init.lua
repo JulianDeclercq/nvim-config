@@ -9,6 +9,9 @@ vim.schedule(function() -- Sync clipboard between OS and Neovim. Schedule the se
   vim.opt.clipboard = 'unnamedplus'
 end)
 
+vim.opt.wrap = false
+vim.opt.sidescroll = 1
+vim.opt.sidescrolloff = 10
 vim.opt.breakindent = true
 vim.opt.undofile = true
 vim.opt.ignorecase = true -- Ignore case in searches
