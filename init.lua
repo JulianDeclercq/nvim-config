@@ -27,7 +27,13 @@ vim.opt.inccommand = 'split' -- Preview substitutions live, as you type!
 vim.opt.cursorline = true
 vim.opt.scrolloff = 10
 vim.opt.confirm = true -- If performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
-vim.env.DOTNET_ROOT = '/usr/local/share/dotnet' -- Ensure OmniSharp locates the .NET SDK on Apple Silicon by setting DOTNET_ROOT
+vim.opt.history = 100 -- how many `:` commands and messages are kept
+
+local is_windows = (vim.loop.os_uname().sysname == 'Windows_NT')
+
+if not is_windows then
+  vim.env.DOTNET_ROOT = '/usr/local/share/dotnet' -- Ensure OmniSharp locates the .NET SDK on Apple Silicon by setting DOTNET_ROOT
+end
 
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
@@ -406,7 +412,43 @@ require('lazy').setup({
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         ts_ls = {},
         -- csharp_ls = {}, -- worked great, but use omnisharp instead since it gives you the same formatting engine as Rider under the hood
-        omnisharp = {},
+        -- omnisharp = -- Windows-safe explicit cmd for OmniSharp
+        omnisharp = (function()
+          local data = vim.fn.stdpath 'data'
+          -- Make sure Mason shims are visible (Windows)
+          vim.env.PATH = data .. '\\mason\\bin;' .. vim.env.PATH
+
+          local candidates = {
+            data .. '\\mason\\bin\\omnisharp.cmd', -- Mason shim
+            data .. '\\mason\\packages\\omnisharp\\OmniSharp\\OmniSharp.exe', -- older layouts
+          }
+
+          local exe
+          for _, p in ipairs(candidates) do
+            if vim.fn.executable(p) == 1 then
+              exe = p
+              break
+            end
+          end
+          if not exe and vim.fn.executable 'omnisharp' == 1 then
+            exe = 'omnisharp'
+          end
+
+          local pid = tostring(vim.fn.getpid())
+          return {
+            cmd = {
+              exe,
+              '-z',
+              '--hostPID',
+              pid,
+              '--encoding',
+              'utf-8',
+              '--languageserver',
+              'FormattingOptions:EnableEditorConfigSupport=true',
+              'Sdk:IncludePrereleases=true',
+            },
+          }
+        end)(),
         cssls = {},
         cssmodules_ls = {
           filetypes = { 'css', 'scss', 'sass', 'less' },
@@ -445,12 +487,15 @@ require('lazy').setup({
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
       })
-      require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+      require('mason-tool-installer').setup {
+        ensure_installed = ensure_installed,
+        auto_uninstall = true, -- uninstall anything not in ensure_enabled
+      }
 
       require('mason-lspconfig').setup {
         ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
         automatic_installation = false,
-        automatic_enable = true,
+        automatic_enable = false, -- don't automatically enable servers even if they are installed. Instead only take the ones from 'servers'.
         handlers = {
           function(server_name)
             local server = servers[server_name] or {}
@@ -462,9 +507,14 @@ require('lazy').setup({
           end,
         },
       }
+
+      -- Since I disabled automatic_install, manually setup only the ones in `servers`
+      for name, server in pairs(servers) do
+        server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+        require('lspconfig')[name].setup(server)
+      end
     end,
   },
-
   { -- Autoformat
     'stevearc/conform.nvim',
     event = { 'BufWritePre' },
@@ -475,7 +525,7 @@ require('lazy').setup({
         function()
           require('conform').format { async = true } --, lsp_format = 'fallback' }
         end,
-        mode = '',
+        mode = { 'n', 'v' },
         desc = '[F]ormat buffer',
       },
     },
@@ -489,17 +539,14 @@ require('lazy').setup({
         else
           return {
             timeout_ms = 500,
-            lsp_format = 'fallback',
+            lsp_fallback = true,
           }
         end
       end,
 
       formatters_by_ft = {
         lua = { 'stylua' },
-        cs = {
-          lsp_format = true, -- let lsp (OmniSharp) handle the formatting when `:Conform` or `<leader>f` since it's great
-          stop_after_first = true,
-        },
+        cs = { 'lsp' }, -- let lsp (OmniSharp) handle the formatting when `:Conform` or `<leader>f` since it's great
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
@@ -810,9 +857,6 @@ vim.o.termguicolors = true
 
 -- Julle TermHere command
 local function term_here(args)
-  -- Determine OS (true if Windows)
-  local is_windows = (vim.loop.os_uname().sysname == 'Windows_NT')
-
   -- Try to get the full path of the current buffer:
   local cur_path = vim.api.nvim_buf_get_name(0)
   local bufdir = ''
