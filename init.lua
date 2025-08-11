@@ -936,7 +936,6 @@ vim.api.nvim_create_user_command('StackTraceFmt', function()
 end, { desc = 'Format stack trace: newline before each "at"' })
 
 -- auto-read
-vim.opt.updatetime = 1000 -- fire CursorHold and CursorHoldI events after 1000ms instead of the default
 vim.o.autoread = true
 
 local auto_read = vim.api.nvim_create_augroup('AutoReadAll', { clear = true })
@@ -945,6 +944,7 @@ vim.api.nvim_create_autocmd('FocusGained', {
   pattern = '*',
   command = "if getcmdwintype() == '' | checktime | endif",
 })
+
 vim.api.nvim_create_autocmd('BufEnter', {
   group = auto_read,
   pattern = '*',
@@ -952,6 +952,7 @@ vim.api.nvim_create_autocmd('BufEnter', {
 })
 
 -- auto-save
+vim.opt.updatetime = 1000 -- fire CursorHold and CursorHoldI events after 1000ms instead of the default
 vim.o.autowrite = true
 
 local auto_save = vim.api.nvim_create_augroup('AutoSaveAll', { clear = true })
@@ -960,7 +961,14 @@ vim.api.nvim_create_autocmd({ 'BufLeave', 'FocusLost' }, {
   pattern = '*',
   command = 'silent! write',
 })
+
 vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
+  group = auto_save,
+  pattern = '*',
+  command = 'silent! write',
+})
+
+vim.api.nvim_create_autocmd('InsertLeave', { -- auto-save on exiting insert mode
   group = auto_save,
   pattern = '*',
   command = 'silent! write',
