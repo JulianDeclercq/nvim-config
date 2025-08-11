@@ -411,44 +411,45 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         ts_ls = {},
-        -- csharp_ls = {}, -- worked great, but use omnisharp instead since it gives you the same formatting engine as Rider under the hood
-        -- omnisharp = -- Windows-safe explicit cmd for OmniSharp
-        omnisharp = (function()
-          local data = vim.fn.stdpath 'data'
-          -- Make sure Mason shims are visible (Windows)
-          vim.env.PATH = data .. '\\mason\\bin;' .. vim.env.PATH
+        -- csharp_ls = {}, -- worked great, but use omnisharp instead since it gives you the same formatting engine as Rider under the hood (allegedly but it's not really that simple haha)
+        omnisharp = is_windows
+            and (function()
+              local data = vim.fn.stdpath 'data'
+              -- Make sure Mason shims are visible (Windows)
+              vim.env.PATH = data .. '\\mason\\bin;' .. vim.env.PATH
 
-          local candidates = {
-            data .. '\\mason\\bin\\omnisharp.cmd', -- Mason shim
-            data .. '\\mason\\packages\\omnisharp\\OmniSharp\\OmniSharp.exe', -- older layouts
-          }
+              local candidates = {
+                data .. '\\mason\\bin\\omnisharp.cmd', -- Mason shim
+                data .. '\\mason\\packages\\omnisharp\\OmniSharp\\OmniSharp.exe', -- older layouts
+              }
 
-          local exe
-          for _, p in ipairs(candidates) do
-            if vim.fn.executable(p) == 1 then
-              exe = p
-              break
-            end
-          end
-          if not exe and vim.fn.executable 'omnisharp' == 1 then
-            exe = 'omnisharp'
-          end
+              local exe
+              for _, p in ipairs(candidates) do
+                if vim.fn.executable(p) == 1 then
+                  exe = p
+                  break
+                end
+              end
+              if not exe and vim.fn.executable 'omnisharp' == 1 then
+                exe = 'omnisharp'
+              end
 
-          local pid = tostring(vim.fn.getpid())
-          return {
-            cmd = {
-              exe,
-              '-z',
-              '--hostPID',
-              pid,
-              '--encoding',
-              'utf-8',
-              '--languageserver',
-              'FormattingOptions:EnableEditorConfigSupport=true',
-              'Sdk:IncludePrereleases=true',
-            },
-          }
-        end)(),
+              local pid = tostring(vim.fn.getpid())
+              return {
+                cmd = {
+                  exe,
+                  '-z',
+                  '--hostPID',
+                  pid,
+                  '--encoding',
+                  'utf-8',
+                  '--languageserver',
+                  'FormattingOptions:EnableEditorConfigSupport=true',
+                  'Sdk:IncludePrereleases=true',
+                },
+              }
+            end)()
+          or {}, -- use empty table for non-windows
         cssls = {},
         cssmodules_ls = {
           filetypes = { 'css', 'scss', 'sass', 'less' },
