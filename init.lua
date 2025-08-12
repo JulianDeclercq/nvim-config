@@ -434,7 +434,7 @@ require('lazy').setup({
 
         if fileType == 'cs' then
           return {
-            timeout_ms = 2500, -- dotnet format can take a bit longer
+            timeout_ms = 10000, -- dotnet format can take a bit longer
             lsp_fallback = false,
           }
         end
@@ -449,7 +449,8 @@ require('lazy').setup({
         dotnet_format = {
           inherit = false,
           command = 'dotnet',
-          args = { 'format', '--no-restore', '--include', '$FILENAME' }, --no-restore so it skips package restore for faster formatting
+          -- args = { 'format', '--no-restore', '--include', '$FILENAME' }, --no-restore so it skips package restore for faster formatting
+          args = { 'format', '--no-restore', '--include', '$RELATIVE_FILEPATH' }, -- THIS WAS NEEDED BC I SET CWD
           stdin = false, --dotnet format reads from files, not stdin
           -- Run from the nearest folder that has a .sln or .csproj so dotnet format can find the workspace
           cwd = function()
@@ -469,6 +470,12 @@ require('lazy').setup({
               -- Return start_dir or explicitly fail
               return start_dir -- or `return nil` if you want to skip
             end
+          end,
+          -- Optional: hook to see expanded args
+          preprocess = function(ctx, cmd)
+            print('[DEBUG] Will run:', cmd.command, unpack(cmd.args))
+            print('[DEBUG] cwd:', cmd.cwd)
+            return cmd
           end,
         },
       },
