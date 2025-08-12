@@ -344,7 +344,6 @@ require('lazy').setup({
         -- Some languages (like typescript) have entire language plugins that can be useful:
         --    https://github.com/pmizio/typescript-tools.nvim
         ts_ls = {},
-        -- csharp_ls = {}, -- worked great, but use omnisharp instead since it gives you the same formatting engine as Rider under the hood (allegedly but it's not really that simple haha)
         omnisharp = is_windows and (function()
           return {
             cmd = {
@@ -427,27 +426,63 @@ require('lazy').setup({
       notify_on_error = false,
       format_on_save = function(bufnr)
         -- Disable "format_on_save lsp_fallback" for languages that don't have a well standardized coding style.
-        -- You can add additional languages here or re-enable it for the disabled ones.
         local disable_filetypes = { c = true, cpp = true }
-        if disable_filetypes[vim.bo[bufnr].filetype] then
+        local fileType = vim.bo[bufnr].filetype
+        if disable_filetypes[fileType] then
           return nil
-        else
+        end
+
+        if fileType == 'cs' then
           return {
-            timeout_ms = 500,
-            lsp_fallback = true,
+            timeout_ms = 2500, -- dotnet format can take a bit longer
+            lsp_fallback = false,
           }
         end
+
+        return {
+          timeout_ms = 500,
+          lsp_fallback = true,
+        }
       end,
+
+      formatters = {
+        dotnet_format = {
+          inherit = false,
+          command = 'dotnet',
+          args = { 'format', '--no-restore', '--include', '$FILENAME' }, --no-restore so it skips package restore for faster formatting
+          stdin = false, --dotnet format reads from files, not stdin
+          -- Run from the nearest folder that has a .sln or .csproj so dotnet format can find the workspace
+          cwd = function()
+            local bufname = vim.api.nvim_buf_get_name(0)
+            local start_dir = bufname ~= '' and vim.fs.dirname(bufname) or vim.loop.cwd()
+
+            local candidates = vim.fs.find(function(name)
+              return name:match '%.sln$' or name:match '%.csproj$'
+            end, { path = start_dir, type = 'file', upward = true })
+
+            if #candidates > 0 then
+              local result = vim.fs.dirname(candidates[1])
+              print('[DEBUG] Found workspace at:', result)
+              return result
+            else
+              print('[DEBUG] No .sln or .csproj found, starting dir was:', start_dir)
+              -- Return start_dir or explicitly fail
+              return start_dir -- or `return nil` if you want to skip
+            end
+          end,
+        },
+      },
 
       formatters_by_ft = {
         lua = { 'stylua' },
-        cs = { 'lsp' }, -- let lsp (OmniSharp) handle the formatting when `:Conform` or `<leader>f` since it's great
+        cs = { 'dotnet_format' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
         -- javascript = { "prettierd", "prettier", stop_after_first = true },
 
+        -- TODO: Why are these both here and in my LINT setup? Need to check which ones are needed and which are not
         html = { 'prettier' },
         javascript = { 'prettier' },
         typescript = { 'prettier' },
@@ -894,23 +929,29 @@ vim.api.nvim_create_autocmd('BufEnter', {
 vim.opt.updatetime = 1000 -- fire CursorHold and CursorHoldI events after 1000ms instead of the default
 vim.o.autowrite = true
 
+local function save_if_writable()
+  if vim.bo.readonly or not vim.bo.modifiable then
+    return
+  end
+
+  -- skip help/quickfix/terminal/etc.
+  if vim.bo.buftype ~= '' then
+    return
+  end
+
+  -- skip unnamed scratch buffers
+  if vim.api.nvim_buf_get_name(0) == '' then
+    return
+  end
+
+  vim.cmd 'silent! write'
+end
+
 local auto_save = vim.api.nvim_create_augroup('AutoSaveAll', { clear = true })
-vim.api.nvim_create_autocmd({ 'BufLeave', 'FocusLost' }, {
+vim.api.nvim_create_autocmd({ 'BufLeave', 'FocusLost', 'CursorHold', 'CursorHoldI', 'InsertLeave' }, {
   group = auto_save,
   pattern = '*',
-  command = 'silent! write',
-})
-
-vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
-  group = auto_save,
-  pattern = '*',
-  command = 'silent! write',
-})
-
-vim.api.nvim_create_autocmd('InsertLeave', { -- auto-save on exiting insert mode
-  group = auto_save,
-  pattern = '*',
-  command = 'silent! write',
+  callback = save_if_writable,
 })
 
 -- Debug stuff for LspInfo
