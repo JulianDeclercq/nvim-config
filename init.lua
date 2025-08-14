@@ -383,9 +383,12 @@ require('lazy').setup({
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
       })
+
       require('mason-tool-installer').setup {
         ensure_installed = ensure_installed,
-        auto_uninstall = true, -- uninstall anything not in ensure_enabled
+        integrations = {
+          ['mason-lspconfig'] = true,
+        },
       }
 
       require('mason-lspconfig').setup {
