@@ -3,9 +3,7 @@ Originally started as a fork from [kickstart](https://github.com/nvim-lua/kickst
 
 ## Installing Neovim
 ### Neovim itself
-Kickstart.nvim targets *only* the latest
-['stable'](https://github.com/neovim/neovim/releases/tag/stable) and latest
-['nightly'](https://github.com/neovim/neovim/releases/tag/nightly) of Neovim.
+['stable'](https://github.com/neovim/neovim/releases/tag/stable)
 
 ### Install External Dependencies
 External Requirements:
@@ -16,10 +14,9 @@ External Requirements:
   - if you have it set `vim.g.have_nerd_font` in `init.lua` to true
 
 > [!NOTE]
-> See [Install Recipes](#Install-Recipes) for additional Windows and Linux specific notes
-> and quick install snippets
+> See [Install Recipes](#Install-Recipes) for additional Windows specific notes and quick install snippets
 
-### Install Kickstart
+### Installation
 Neovim's configurations are located under the following paths, depending on your OS:
 
 | OS | PATH |
@@ -30,6 +27,7 @@ Neovim's configurations are located under the following paths, depending on your
 
 #### Clone the repo
 <details><summary> Linux and Mac </summary>
+
 ```
 git clone git@github.com:JulianDeclercq/nvim-config.git "${XDG_CONFIG_HOME:-$HOME/.config}"/nvim
 ```
