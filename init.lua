@@ -394,7 +394,7 @@ require('lazy').setup({
       require('mason-lspconfig').setup {
         ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
         automatic_installation = false,
-        automatic_enable = false, -- don't automatically enable servers even if they are installed. Instead only take the ones from 'servers'.
+        automatic_enable = true,
         handlers = {
           function(server_name)
             local server = servers[server_name] or {}
@@ -403,12 +403,6 @@ require('lazy').setup({
           end,
         },
       }
-
-      -- Since I disabled automatic_install, manually setup only the ones in `servers`
-      for name, server in pairs(servers) do
-        server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-        require('lspconfig')[name].setup(server)
-      end
     end,
   },
   { -- Autoformat
