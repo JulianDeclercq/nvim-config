@@ -412,17 +412,10 @@ require('lazy').setup({
       notify_on_error = false,
       format_on_save = function(bufnr)
         -- Disable "format_on_save lsp_fallback" for languages that don't have a well standardized coding style.
-        local disable_filetypes = { c = true, cpp = true }
+        local disable_filetypes = { c = true, cpp = true, cs = true }
         local fileType = vim.bo[bufnr].filetype
         if disable_filetypes[fileType] then
           return nil
-        end
-
-        if fileType == 'cs' then
-          return {
-            timeout_ms = 10000, -- dotnet format can take a bit longer
-            lsp_fallback = false,
-          }
         end
 
         return {
@@ -438,6 +431,7 @@ require('lazy').setup({
           -- args = { 'format', '--no-restore', '--include', '$FILENAME' }, --no-restore so it skips package restore for faster formatting
           args = { 'format', '--no-restore', '--include', '$RELATIVE_FILEPATH' }, -- THIS WAS NEEDED BC I SET CWD
           stdin = false, --dotnet format reads from files, not stdin
+          require_cwd = true,
           -- Run from the nearest folder that has a .sln or .csproj so dotnet format can find the workspace
           cwd = function()
             local bufname = vim.api.nvim_buf_get_name(0)
@@ -453,15 +447,8 @@ require('lazy').setup({
               return result
             else
               print('[DEBUG] No .sln or .csproj found, starting dir was:', start_dir)
-              -- Return start_dir or explicitly fail
-              return start_dir -- or `return nil` if you want to skip
+              return nil
             end
-          end,
-          -- Optional: hook to see expanded args
-          preprocess = function(ctx, cmd)
-            print('[DEBUG] Will run:', cmd.command, unpack(cmd.args))
-            print('[DEBUG] cwd:', cmd.cwd)
-            return cmd
           end,
         },
       },
@@ -993,3 +980,22 @@ vim.api.nvim_create_user_command('LspInfoCapabilities', function()
   vim.bo.swapfile = false
   vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
 end, {})
+
+-- Conform dotnet format messages
+vim.api.nvim_create_autocmd('User', {
+  pattern = 'ConformFormatPre',
+  callback = function(args)
+    if vim.bo[args.buf].filetype == 'cs' then
+      vim.notify('Running dotnet format..', vim.log.levels.INFO)
+    end
+  end,
+})
+
+vim.api.nvim_create_autocmd('User', {
+  pattern = 'ConformFormatPost',
+  callback = function(args)
+    if vim.bo[args.buf].filetype == 'cs' then
+      vim.notify('Finished dotnet format!', vim.log.levels.INFO)
+    end
+  end,
+})
