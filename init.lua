@@ -371,7 +371,9 @@ require('lazy').setup({
       -- Installing more tools using Mason
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
-        'stylua', -- Used to format Lua code
+        'stylua', -- Lua formatter
+        'prettier', -- Prettier CLI
+        'prettierd', -- Prettierd daemon (faster)
       })
 
       require('mason-tool-installer').setup {
@@ -420,7 +422,7 @@ require('lazy').setup({
         end
 
         return {
-          timeout_ms = 500,
+          timeout_ms = 1000,
           lsp_fallback = true,
         }
       end,
@@ -455,23 +457,16 @@ require('lazy').setup({
       },
 
       formatters_by_ft = {
+        javascript = { 'prettierd', 'prettier', stop_after_first = true },
+        javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+        typescript = { 'prettierd', 'prettier', stop_after_first = true },
+        typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+        html = { 'prettierd', 'prettier', stop_after_first = true },
+        css = { 'prettierd', 'prettier', stop_after_first = true },
+        json = { 'prettierd', 'prettier', stop_after_first = true },
+        markdown = { 'prettierd', 'prettier', stop_after_first = true },
         lua = { 'stylua' },
         cs = { 'dotnet_format' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
-
-        -- TODO: Why are these both here and in my LINT setup? Need to check which ones are needed and which are not
-        html = { 'prettier' },
-        javascript = { 'prettier' },
-        typescript = { 'prettier' },
-        typescriptreact = { 'prettier' },
-        json = { 'prettier' },
-        css = { 'prettier' },
-        markdown = { 'prettier' },
-
         ['*'] = { 'trim_whitespace' },
       },
     },

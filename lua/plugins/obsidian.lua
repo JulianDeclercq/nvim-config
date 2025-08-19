@@ -94,7 +94,7 @@ return {
         path = obsidian_path,
       },
     },
-    note_id_func = noteIdFunction,
+    -- note_id_func = noteIdFunction,
     follow_url_func = function(url)
       -- Open the URL in the default web browser.
       vim.ui.open(url)
