@@ -333,21 +333,22 @@ require('lazy').setup({
         -- Some languages (like typescript) have entire language plugins that can be useful:
         --    https://github.com/pmizio/typescript-tools.nvim
         ts_ls = {},
-        omnisharp = is_windows and (function()
-          return {
-            cmd = {
-              'omnisharp',
-              '-z',
-              '--hostPID',
-              tostring(vim.fn.getpid()),
-              '--encoding',
-              'utf-8',
-              '--languageserver',
-              'FormattingOptions:EnableEditorConfigSupport=true',
-              'Sdk:IncludePrereleases=true',
-            },
-          }
-        end)() or {}, -- use empty table for non-windows
+        csharp_ls = {},
+        -- omnisharp = is_windows and (function()
+        --   return {
+        --     cmd = {
+        --       'omnisharp',
+        --       '-z',
+        --       '--hostPID',
+        --       tostring(vim.fn.getpid()),
+        --       '--encoding',
+        --       'utf-8',
+        --       '--languageserver',
+        --       'FormattingOptions:EnableEditorConfigSupport=true',
+        --       'Sdk:IncludePrereleases=true',
+        --     },
+        --   }
+        -- end)() or {}, -- use empty table for non-windows
         cssls = {},
         cssmodules_ls = {
           filetypes = { 'css', 'scss', 'sass', 'less' },

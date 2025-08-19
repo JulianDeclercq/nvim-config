@@ -59,6 +59,11 @@ return {
       desc = '[O]bsidian: [F]ind',
     },
     {
+      '<leader>og',
+      '<Cmd>ObsidianSearch<CR>',
+      desc = '[O]bsidian: [G]rep',
+    },
+    {
       '<leader>oo',
       '<Cmd>ObsidianOpen<CR>',
       desc = '[O]bsidian: [O]pen',
