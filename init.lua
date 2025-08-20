@@ -471,38 +471,33 @@ require('lazy').setup({
       },
     },
   },
+  { -- Snippet Engine
+    'L3MON4D3/LuaSnip',
+    version = '2.*',
+    dependencies = {},
+    opts = {},
+    config = function()
+      local ls = require 'luasnip'
+
+      ls.add_snippets('all', {
+        ls.snippet('charactermoc', {
+          ls.text_node {
+            '# CHARACTERNAME MOC',
+            '## Tutorials',
+            '## Anti',
+            '## Misc',
+          },
+        }),
+      })
+    end,
+  },
   { -- Autocompletion
     'saghen/blink.cmp',
     build = 'cargo +nightly build --release',
     event = 'VimEnter',
     version = '1.*',
     dependencies = {
-      -- Snippet Engine
-      {
-        'L3MON4D3/LuaSnip',
-        version = '2.*',
-        build = (function()
-          -- Build Step is needed for regex support in snippets.
-          -- This step is not supported in many windows environments.
-          -- Remove the below condition to re-enable on windows.
-          if vim.fn.has 'win32' == 1 or vim.fn.executable 'make' == 0 then
-            return
-          end
-          return 'make install_jsregexp'
-        end)(),
-        dependencies = {
-          -- `friendly-snippets` contains a variety of premade snippets.
-          --    See the README about individual language/framework/plugin snippets:
-          --    https://github.com/rafamadriz/friendly-snippets
-          -- {
-          --   'rafamadriz/friendly-snippets',
-          --   config = function()
-          --     require('luasnip.loaders.from_vscode').lazy_load()
-          --   end,
-          -- },
-        },
-        opts = {},
-      },
+      'L3MON4D3/LuaSnip',
       'folke/lazydev.nvim',
     },
     --- @module 'blink.cmp'
