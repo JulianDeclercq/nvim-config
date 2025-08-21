@@ -875,10 +875,15 @@ vim.api.nvim_create_user_command('PwdCopy', function()
   vim.notify('Copied to clipboard: ' .. dir, vim.log.levels.INFO, { title = 'PwdCopy' })
 end, { desc = 'Copy current buffer directory to clipboard' })
 
-vim.api.nvim_create_user_command('StackTraceFmt', function()
+vim.api.nvim_create_user_command('FormatStackTrace', function()
   -- Substitute over the whole buffer: insert a newline before each "at"
   vim.cmd [[%s/\<at\>/\rat/g]]
 end, { desc = 'Format stack trace: newline before each "at"' })
+
+vim.api.nvim_create_user_command('FormatGPTMarkdown', function()
+  vim.cmd [[%s/\[\[TB\]\]/```/g]]
+  vim.cmd [[%s/\[\[BT\]\]/`/g]]
+end, { desc = 'Format ChatGPT markdown' })
 
 -- auto-read
 vim.o.autoread = true
