@@ -28,6 +28,7 @@ vim.opt.cursorline = true
 vim.opt.scrolloff = 10
 vim.opt.confirm = true -- If performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
 vim.opt.history = 100 -- how many `:` commands and messages are kept
+vim.opt.fixeol = false -- don't add a final newline
 
 local is_windows = (vim.loop.os_uname().sysname == 'Windows_NT')
 
