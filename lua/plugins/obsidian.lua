@@ -32,7 +32,7 @@ local noteIdFunction = function(title)
 end
 
 return {
-  'epwalsh/obsidian.nvim',
+  'obsidian-nvim/obsidian.nvim',
   version = '*', -- use latest release
   lazy = true,
   event = 'VimEnter', -- load on startup (no file)…, looks like this also works if you do any file so it's kind of pointless for me at the moment, need to figure out why this is or if there's another solution
@@ -40,32 +40,32 @@ return {
   keys = {
     {
       '<leader>on',
-      '<Cmd>ObsidianNew<CR>',
+      '<Cmd>Obsidian new<CR>',
       desc = '[O]bsidian: [N]ew Note',
     },
     {
       '<leader>ol',
-      '<Cmd>ObsidianFollowLink<CR>',
+      '<Cmd>Obsidian follow_link<CR>',
       desc = '[O]bsidian: Follow [L]ink',
     },
     {
       '<leader>oqs',
-      '<Cmd>ObsidianQuickSwitch<CR>',
+      '<Cmd>Obsidian quick_switch<CR>',
       desc = '[O]bsidian: [Q]uick [S]witch',
     },
     {
       '<leader>of',
-      '<Cmd>ObsidianSearch<CR>',
+      '<Cmd>Obsidian search<CR>',
       desc = '[O]bsidian: [F]ind',
     },
     {
       '<leader>og',
-      '<Cmd>ObsidianSearch<CR>',
+      '<Cmd>Obsidian search<CR>',
       desc = '[O]bsidian: [G]rep',
     },
     {
       '<leader>oo',
-      '<Cmd>ObsidianOpen<CR>',
+      '<Cmd>Obsidian open<CR>',
       desc = '[O]bsidian: [O]pen',
     },
     {
@@ -111,5 +111,6 @@ return {
     ui = {
       enable = false,
     },
+    legacy_commands = false,
   },
 }
