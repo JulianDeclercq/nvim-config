@@ -81,6 +81,11 @@ return {
       desc = '[O]bsidian: [O]pen',
     },
     {
+      '<leader>ob',
+      '<Cmd>Obsidian backlinks<CR>',
+      desc = '[O]bsidian [B]acklinks',
+    },
+    {
       '<leader>os',
       function()
         require('telescope.builtin').find_files {
