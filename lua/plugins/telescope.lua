@@ -57,13 +57,15 @@ return { -- Fuzzy Finder (files, lsp, etc)
     -- Enable Telescope extensions if they are installed
     pcall(require('telescope').load_extension, 'fzf')
     pcall(require('telescope').load_extension, 'ui-select')
+    pcall(require('telescope').load_extension, 'luasnip')
 
     -- See `:help telescope.builtin`
     local builtin = require 'telescope.builtin'
     vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = '[F]ind [H]elp' })
     vim.keymap.set('n', '<leader>fk', builtin.keymaps, { desc = '[F]ind [K]eymaps' })
     vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = '[F]ind [F]iles' })
-    vim.keymap.set('n', '<leader>fs', builtin.builtin, { desc = '[F]ind [S]elect Telescope' })
+    -- vim.keymap.set('n', '<leader>fs', builtin.builtin, { desc = '[F]ind [S]elect Telescope' })
+    vim.keymap.set('n', '<leader>fs', '<Cmd>Telescope luasnip<CR>', { desc = '[F]ind [S]nippets' })
     vim.keymap.set('n', '<leader>fw', builtin.grep_string, { desc = '[F]ind current [W]ord' })
     vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = '[F]ind by [G]rep' })
     vim.keymap.set('n', '<leader>fd', builtin.diagnostics, { desc = '[F]ind [D]iagnostics' })
