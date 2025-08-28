@@ -13,8 +13,6 @@ return {
   'obsidian-nvim/obsidian.nvim',
   version = '*', -- use latest release
   lazy = true,
-  event = 'VimEnter', -- load on startup (no file)…, looks like this also works if you do any file so it's kind of pointless for me at the moment, need to figure out why this is or if there's another solution
-  ft = 'markdown', -- …or on any markdown buffer
   dependencies = {
     'nvim-lua/plenary.nvim',
     'hrsh7th/nvim-cmp', -- autocomplete for note references
