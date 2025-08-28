@@ -481,7 +481,10 @@ require('lazy').setup({
       local ls = require 'luasnip'
 
       ls.add_snippets('all', {
-        ls.snippet('charactermoc', {
+        ls.snippet({
+          trig = 'charactermoc',
+          hidden = true, -- hide from autocomplete, so you'll have to either expand it through the trigger + expand keybind or find it through telescope
+        }, {
           ls.text_node {
             '# CHARACTERNAME MOC',
             '## Tutorials',
