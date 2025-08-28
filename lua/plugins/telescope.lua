@@ -42,6 +42,16 @@ return { -- Fuzzy Finder (files, lsp, etc)
           require('telescope.themes').get_dropdown(),
         },
       },
+      -- allow deleting buffers when Telescope is picking inside Builtin.Buffers
+      pickers = {
+        buffers = {
+          mappings = {
+            n = {
+              ['dd'] = require('telescope.actions').delete_buffer,
+            },
+          },
+        },
+      },
     }
 
     -- Enable Telescope extensions if they are installed
