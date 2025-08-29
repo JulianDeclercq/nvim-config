@@ -35,7 +35,8 @@ return {
     --  * "notes_subdir" - put new notes in the default notes subdirectory.
     new_notes_location = 'notes_subdir',
     completion = {
-      nvim_cmp = true,
+      nvim_cmp = false,
+      blink = true,
       min_chars = 2,
       file_popup = true,
     },

@@ -884,8 +884,8 @@ vim.api.nvim_create_user_command('FormatStackTrace', function()
 end, { desc = 'Format stack trace: newline before each "at"' })
 
 vim.api.nvim_create_user_command('FormatGPTMarkdown', function()
-  vim.cmd [[%s/\[\[TB\]\]/```/g]]
-  vim.cmd [[%s/\[\[BT\]\]/`/g]]
+  vim.cmd [[silent! %s/\[\[TB\]\]/```/g]]
+  vim.cmd [[silent! %s/\[\[BT\]\]/`/g]]
 end, { desc = 'Format ChatGPT markdown' })
 
 -- auto-read
