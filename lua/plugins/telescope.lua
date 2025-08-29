@@ -58,6 +58,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
     pcall(require('telescope').load_extension, 'fzf')
     pcall(require('telescope').load_extension, 'ui-select')
     pcall(require('telescope').load_extension, 'luasnip')
+    pcall(require('telescope').load_extension, 'bookmarks')
 
     -- See `:help telescope.builtin`
     local builtin = require 'telescope.builtin'
@@ -72,8 +73,8 @@ return { -- Fuzzy Finder (files, lsp, etc)
     vim.keymap.set('n', '<leader>fr', builtin.resume, { desc = '[F]ind [R]esume' })
     vim.keymap.set('n', '<leader>f.', builtin.oldfiles, { desc = '[F]ind Recent Files ("." for repeat)' })
     vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
-    -- open oldfiles
-    vim.keymap.set('n', '<leader>fof', "<cmd>lua require('telescope.builtin').oldfiles()<CR>", { noremap = true, silent = true, desc = '[F]ind [O]ld [F]iles' })
+    vim.keymap.set('n', '<leader>fof', "<Cmd>lua require('telescope.builtin').oldfiles()<CR>", { noremap = true, silent = true, desc = '[F]ind [O]ld [F]iles' })
+    vim.keymap.set('n', '<leader>fbm', '<Cmd>Telescope bookmarks list<CR>', { desc = '[F]ind [B]ookmarks' })
 
     -- Slightly advanced example of overriding default behavior and theme
     vim.keymap.set('n', '<leader>/', function()
