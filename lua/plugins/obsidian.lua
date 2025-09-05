@@ -85,6 +85,11 @@ return {
       desc = '[O]bsidian [B]acklinks',
     },
     {
+      '<leader>ot',
+      '<Cmd>Obsidian today<CR>',
+      desc = '[O]bsidian [T]oday',
+    },
+    {
       '<leader>os',
       function()
         require('telescope.builtin').find_files {

@@ -464,7 +464,7 @@ require('lazy').setup({
         typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
         html = { 'prettierd', 'prettier', stop_after_first = true },
         css = { 'prettierd', 'prettier', stop_after_first = true },
-        json = { 'prettierd', 'prettier', stop_after_first = true },
+        -- json = { 'prettierd', 'prettier', stop_after_first = true },
         markdown = { 'prettierd', 'prettier', stop_after_first = true },
         lua = { 'stylua' },
         cs = { 'dotnet_format' },
@@ -888,6 +888,18 @@ vim.api.nvim_create_user_command('FormatGPTMarkdown', function()
   vim.cmd [[silent! %s/\[\[BT\]\]/`/g]]
 end, { desc = 'Format ChatGPT markdown' })
 
+vim.api.nvim_create_user_command('DeleteFile', function()
+  local name = vim.api.nvim_buf_get_name(0)
+  if name == '' then
+    return
+  end
+
+  vim.b.skip_autosave = true
+  vim.fn.delete(name)
+  vim.cmd 'enew' -- new empty buffer
+  vim.cmd 'bdelete #' -- wipe the old buffer
+end, { desc = 'Delete the file tied to the current buffer' })
+
 -- auto-read
 vim.o.autoread = true
 
@@ -909,7 +921,7 @@ vim.opt.updatetime = 1000 -- fire CursorHold and CursorHoldI events after 1000ms
 vim.o.autowrite = true
 
 local function save_if_writable()
-  if vim.bo.readonly or not vim.bo.modifiable then
+  if vim.b.skip_autosave or vim.bo.readonly or not vim.bo.modifiable then
     return
   end
 
@@ -932,54 +944,6 @@ vim.api.nvim_create_autocmd({ 'BufLeave', 'FocusLost', 'CursorHold', 'CursorHold
   pattern = '*',
   callback = save_if_writable,
 })
-
--- Debug stuff for LspInfo
-vim.api.nvim_create_user_command('LspInfoFormatting', function()
-  local clients = vim.lsp.get_clients { bufnr = 0 }
-  if #clients == 0 then
-    vim.notify('No LSP clients attached to this buffer', vim.log.levels.INFO)
-    return
-  end
-
-  local lines = {}
-  for _, client in ipairs(clients) do
-    local supports_format = client.server_capabilities.documentFormattingProvider
-    local status = supports_format and 'supports formatting' or 'does NOT support formatting'
-    table.insert(lines, client.name .. ': ' .. status)
-  end
-
-  -- Open a scratch buffer and fill it
-  vim.cmd 'new'
-  vim.bo.buftype = 'nofile'
-  vim.bo.bufhidden = 'wipe'
-  vim.bo.swapfile = false
-  vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
-end, {})
-
-vim.api.nvim_create_user_command('LspInfoCapabilities', function()
-  local clients = vim.lsp.get_clients { bufnr = 0 }
-  if #clients == 0 then
-    vim.notify('No LSP clients attached to this buffer', vim.log.levels.INFO)
-    return
-  end
-
-  local lines = {}
-  for _, client in ipairs(clients) do
-    table.insert(lines, 'Client: ' .. client.name)
-    local caps = vim.split(vim.inspect(client.server_capabilities), '\n')
-    for _, cap in ipairs(caps) do
-      table.insert(lines, '  ' .. cap)
-    end
-    table.insert(lines, '') -- blank line between clients
-  end
-
-  -- Open scratch buffer
-  vim.cmd 'new'
-  vim.bo.buftype = 'nofile'
-  vim.bo.bufhidden = 'wipe'
-  vim.bo.swapfile = false
-  vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
-end, {})
 
 -- Conform dotnet format messages
 vim.api.nvim_create_autocmd('User', {
