@@ -79,11 +79,9 @@ end
 
 ---@param target string
 local function replace_word_under_cursor(target)
-  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
-  row = row - 1 -- make it 0 indexed for API calls
-
-  local word = vim.fn.expand '<cWORD>'
-  vim.api.nvim_buf_set_text(0, row, col - #word + 1, row, col + 1, { target })
+  vim.cmd 'normal! viW' -- visual select inner word
+  vim.fn.setreg('z', target) -- put the target in a temp register
+  vim.cmd 'normal! "zp"' -- paste over the selection
 end
 
 function module.format_tekken_move()
