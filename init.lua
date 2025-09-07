@@ -404,12 +404,12 @@ require('lazy').setup({
     cmd = { 'ConformInfo' },
     keys = {
       {
-        '<leader>ff',
+        '<leader>fmf',
         function()
           require('conform').format { async = true } --, lsp_format = 'fallback' }
         end,
         mode = { 'n', 'v' },
-        desc = '[F]ormat [F]ile (buffer)',
+        desc = '[F]or[M]at [F]ile (buffer)',
       },
     },
     opts = {
@@ -963,3 +963,4 @@ vim.api.nvim_create_autocmd('User', {
 })
 
 vim.keymap.set('n', '<leader>ft', require('tekken_format').format_tekken_move, { desc = '[F]ormat [T]ekken Move' })
+vim.keymap.set('n', '<leader>ftk', require('tekken_picker').pick, { desc = '[F]ind [T]e[K]ken' })
