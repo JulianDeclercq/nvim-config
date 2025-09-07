@@ -480,19 +480,35 @@ require('lazy').setup({
     config = function()
       local ls = require 'luasnip'
 
-      ls.add_snippets('all', {
+      ls.add_snippets(
+        'all',
+        {
+          ls.snippet({
+            trig = 'charactermoc',
+            hidden = true, -- hide from autocomplete, so you'll have to either expand it through the trigger + expand keybind or find it through telescope
+          }, {
+            ls.text_node {
+              '# CHARACTERNAME MOC',
+              '## Tutorials',
+              '## Anti',
+              '## Misc',
+            },
+          }),
+        },
         ls.snippet({
-          trig = 'charactermoc',
-          hidden = true, -- hide from autocomplete, so you'll have to either expand it through the trigger + expand keybind or find it through telescope
+          trig = 'fight',
+          hidden = true,
         }, {
           ls.text_node {
-            '# CHARACTERNAME MOC',
-            '## Tutorials',
-            '## Anti',
-            '## Misc',
+            '```fight',
+            'input:',
+            'name:',
+            'damage:',
+            'hits:',
+            '```',
           },
-        }),
-      })
+        })
+      )
     end,
   },
   { -- Autocompletion
@@ -567,21 +583,6 @@ require('lazy').setup({
       -- Shows a signature help window while you type arguments for a function
       signature = { enabled = true },
     },
-  },
-  { -- I don't really want to use nvim-cmp but obsidian for nvim uses this by default so let's just map the keymaps and call it a day
-    'hrsh7th/nvim-cmp',
-    event = 'InsertEnter', -- load on Insert mode
-    opts = function()
-      local cmp = require 'cmp'
-      return {
-        snippet = { expand = function(_) end }, -- we don’t use snippets here, so this can be a no-op
-        mapping = {
-          ['<C-n>'] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Insert },
-          ['<C-p>'] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Insert },
-          ['<C-y>'] = cmp.mapping.confirm { select = true },
-        },
-      }
-    end,
   },
   { -- You can easily change to a different colorscheme.
     -- Change the name of the colorscheme plugin below, and then
