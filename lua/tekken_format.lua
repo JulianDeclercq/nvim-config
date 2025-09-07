@@ -68,7 +68,8 @@ local function get_character_name()
 end
 
 local function create_link(character, move)
-  local linkMove = move:gsub(',', '%%2C') -- encode comma
+  local linkMove = move:gsub('cd', 'f,n,d,df') -- replace crouchdash
+  linkMove = linkMove:gsub(',', '%%2C') -- encode comma
   linkMove = linkMove:gsub('+', '') -- remove plus
   local link = ('https://tekkendocs.com/t8/%s/%s'):format(character, linkMove)
   local output = ('[%s](%s)'):format(move, link)
