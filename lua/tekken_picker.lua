@@ -155,6 +155,8 @@ function module.buffer_pick()
   local config = require('telescope.config').values
   local actions = require 'telescope.actions'
   local action_state = require 'telescope.actions.state'
+  local previewers = require 'telescope.previewers'
+  local putils = require 'telescope.previewers.utils'
 
   local entries = {}
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
@@ -169,6 +171,27 @@ function module.buffer_pick()
     end
   end
 
+  -- Previewer: copy the selected buffer's text into the preview buffer
+  local buffer_previewer = previewers.new_buffer_previewer {
+    title = 'Grep Preview',
+    get_buffer_by_name = function(_, entry)
+      return 'telescope-bufpreview-' .. entry.value
+    end,
+    define_preview = function(self, entry, _)
+      local bufnr = entry.value
+      if not (bufnr and vim.api.nvim_buf_is_valid(bufnr)) then
+        putils.set_preview_message(self.state.bufnr, 'Invalid buffer')
+        return
+      end
+
+      local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+      vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, lines)
+
+      -- mirror filetype for syntax highlighting
+      vim.bo[self.state.bufnr].filetype = vim.bo[bufnr].filetype
+    end,
+  }
+
   pickers
     .new({}, {
       prompt_title = 'Julles test',
@@ -179,6 +202,7 @@ function module.buffer_pick()
         end,
       },
       sorter = config.generic_sorter {},
+      previewer = buffer_previewer,
       attach_mappings = function(prompt_bufnr, map)
         local open_buf = function()
           local selection = action_state.get_selected_entry()
