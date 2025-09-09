@@ -149,4 +149,50 @@ function module.pick()
     :find()
 end
 
+function module.buffer_pick()
+  local pickers = require 'telescope.pickers'
+  local finders = require 'telescope.finders'
+  local config = require('telescope.config').values
+  local actions = require 'telescope.actions'
+  local action_state = require 'telescope.actions.state'
+
+  local entries = {}
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(buf) then
+      local name = vim.api.nvim_buf_get_name(buf)
+      local short = name ~= '' and vim.fn.fnamemodify(name, ':t') or ('[No Name] ' .. buf)
+      table.insert(entries, {
+        value = buf,
+        display = short,
+        ordinal = name ~= '' and name or short,
+      })
+    end
+  end
+
+  pickers
+    .new({}, {
+      prompt_title = 'Julles test',
+      finder = finders.new_table {
+        results = entries,
+        entry_maker = function(e)
+          return e
+        end,
+      },
+      sorter = config.generic_sorter {},
+      attach_mappings = function(prompt_bufnr, map)
+        local open_buf = function()
+          local selection = action_state.get_selected_entry()
+          actions.close(prompt_bufnr)
+          vim.api.nvim_set_current_buf(selection.value)
+        end
+
+        map('i', '<CR>', open_buf)
+        map('n', '<CR>', open_buf)
+
+        return true
+      end,
+    })
+    :find()
+end
+
 return module
