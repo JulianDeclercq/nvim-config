@@ -14,15 +14,22 @@ local function get_first_alias(bufnr)
 end
 
 local function get_obsidian_name(bufnr)
-  local alias = get_first_alias(bufnr)
-  print('alias ' .. alias)
+  -- get first alias
+  local alias = ''
+  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, 20, false)
+  for i, line in ipairs(lines) do
+    if vim.startswith(line, 'aliases') then
+      alias = lines[i + 1]
+    end
+  end
+
   if alias == '' then
     return ''
   end
 
   local old_name = vim.api.nvim_buf_get_name(bufnr)
   local extension = vim.fn.fnamemodify(old_name, ':e')
-  local new_name = alias .. (extension ~= '' and ('.' .. extension) or '')
+  local new_name = alias:sub(1) .. (extension ~= '' and ('.' .. extension) or '')
   return new_name
 end
 
@@ -48,21 +55,22 @@ function module.pick()
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
     if vim.api.nvim_buf_is_loaded(buf) then
       local name = vim.api.nvim_buf_get_name(buf)
-      local short = name ~= '' and vim.fn.fnamemodify(name, ':t') or ('[No Name] ' .. buf)
+      local displayName = name ~= '' and name or ('[No Name] ' .. buf)
 
       if vim.startswith(name, paths.obsidian) then
         local obsidian_name = get_obsidian_name(buf)
         if obsidian_name ~= '' then
-          short = short .. obsidian_name
+          displayName = vim.fn.fnamemodify(name, ':t') .. obsidian_name
         end
       end
       table.insert(entries, {
         value = buf,
-        ordinal = name ~= '' and name or short,
+        ordinal = name,
+        path = name,
         display = function()
           return displayer {
             { tostring(buf), 'TelescopeResultsNumber' }, -- shows bufnr
-            { short },
+            { displayName },
           }
         end,
       })

@@ -971,4 +971,4 @@ vim.api.nvim_create_autocmd('User', {
 
 vim.keymap.set('n', '<leader>ft', require('tekken_format').format_tekken_move, { desc = '[F]ormat [T]ekken Move' })
 vim.keymap.set('n', '<leader>ftk', require('tekken_picker').pick, { desc = '[F]ind [T]e[K]ken' })
-vim.keymap.set('n', '<leader>fb', require('buffer-picker').pick, { desc = '[F]ind [B]uffers' })
+vim.keymap.set('n', '<leader><leader>', require('buffer-picker').pick, { desc = '[ ] Find existing buffers' })
