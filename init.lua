@@ -227,7 +227,14 @@ require('lazy').setup({
           end
 
           -- Rename the variable under your cursor, most Language Servers support renaming across files, etc.
-          map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
+          map('<leader>rn', function()
+            -- open empty input instead of pre-filled
+            local current_name = vim.fn.expand '<cword>'
+            local new_name = vim.fn.input('Rename to: ', '')
+            if new_name ~= '' and new_name ~= current_name then
+              vim.lsp.buf.rename(new_name)
+            end
+          end, '[R]e[n]ame')
 
           -- Execute a code action, usually your cursor needs to be on top of an error or a suggestion from your LSP for this to activate.
           map('<leader>ca', vim.lsp.buf.code_action, 'Goto [C]ode [A]ction', { 'n', 'x' })
