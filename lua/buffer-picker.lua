@@ -1,26 +1,29 @@
 local module = {}
 
+local paths = require 'config.paths'
+
 local function get_first_alias(bufnr)
   local lines = vim.api.nvim_buf_get_lines(bufnr, 0, 20, false)
-  for _, line in ipairs(lines) do
-    if line:match '^%-%-%' then
-      return lines[line + 1]
+  for i, line in ipairs(lines) do
+    if vim.startswith(line, 'aliases') then
+      return lines[i + 1]
     end
   end
 
   return ''
 end
 
-function module.set_obsidian_bufname(bufnr)
+local function get_obsidian_name(bufnr)
   local alias = get_first_alias(bufnr)
+  print('alias ' .. alias)
   if alias == '' then
-    return
+    return ''
   end
 
   local old_name = vim.api.nvim_buf_get_name(bufnr)
   local extension = vim.fn.fnamemodify(old_name, ':e')
   local new_name = alias .. (extension ~= '' and ('.' .. extension) or '')
-  vim.api.nvim_buf_set_name(bufnr, new_name)
+  return new_name
 end
 
 function module.pick()
@@ -46,6 +49,13 @@ function module.pick()
     if vim.api.nvim_buf_is_loaded(buf) then
       local name = vim.api.nvim_buf_get_name(buf)
       local short = name ~= '' and vim.fn.fnamemodify(name, ':t') or ('[No Name] ' .. buf)
+
+      if vim.startswith(name, paths.obsidian) then
+        local obsidian_name = get_obsidian_name(buf)
+        if obsidian_name ~= '' then
+          short = short .. obsidian_name
+        end
+      end
       table.insert(entries, {
         value = buf,
         ordinal = name ~= '' and name or short,
