@@ -86,7 +86,7 @@ function module.pick()
     define_preview = function(self, entry, _)
       local bufnr = entry.value
       if not (bufnr and vim.api.nvim_buf_is_valid(bufnr)) then
-        putils.set_preview_message(self.state.bufnr, 'Invalid buffer')
+        putils.set_preview_message(self.state.bufnr, self.state.winid, 'Invalid buffer')
         return
       end
 
