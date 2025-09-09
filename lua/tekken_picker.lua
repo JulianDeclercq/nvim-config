@@ -157,6 +157,15 @@ function module.buffer_pick()
   local action_state = require 'telescope.actions.state'
   local previewers = require 'telescope.previewers'
   local putils = require 'telescope.previewers.utils'
+  local entry_display = require 'telescope.pickers.entry_display'
+
+  local displayer = entry_display.create {
+    separator = ' ',
+    items = {
+      { width = 4 }, -- bufnr
+      { remaining = true }, -- filename
+    },
+  }
 
   local entries = {}
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
@@ -165,8 +174,13 @@ function module.buffer_pick()
       local short = name ~= '' and vim.fn.fnamemodify(name, ':t') or ('[No Name] ' .. buf)
       table.insert(entries, {
         value = buf,
-        display = short,
         ordinal = name ~= '' and name or short,
+        display = function()
+          return displayer {
+            { tostring(buf), 'TelescopeResultsNumber' }, -- shows bufnr
+            { short },
+          }
+        end,
       })
     end
   end
