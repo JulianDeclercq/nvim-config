@@ -974,4 +974,4 @@ vim.keymap.set('n', '<leader>ftk', require('tekken_picker').pick, { desc = '[F]i
 
 vim.api.nvim_create_user_command('ObsidianUpgrade', function()
   require('obsidian_zettelkasten_migration').migrate_file()
-end, { desc = 'Migrates the currently open Obsidian file to zetelkasten format.' })
+end, { desc = 'Migrates the currently open Obsidian file to Zettelkasten format.' })

@@ -1,9 +1,6 @@
--- Takes a file from before zettelkasten and makes it into a zettelkasten file
+-- Migrates the currently open Obsidian file to Zettelkasten format.
 
 local module = {}
-
-local paths = require 'config.paths'
-
 local function generate_zetelkasten_id()
   -- mimic the oen from obsidian-nvim/obsidian.nvim (not super important)
   local suffix = ''
@@ -24,13 +21,10 @@ local function update_frontmatter_alias(old_title)
       vim.api.nvim_buf_set_lines(buf, i - 1, i, false, { new_line })
       return
     end
-
-    -- TODO: Save for formatting to kick in?
   end
 end
 
 module.migrate_file = function()
-  -- get the current file and save it as a new file
   local old_id = vim.fn.expand '%:t:r'
   local new_id = generate_zetelkasten_id()
   if new_id == nil then
@@ -41,9 +35,6 @@ module.migrate_file = function()
   vim.cmd 'wa' -- ensure backlink updates are written, see the README
 
   update_frontmatter_alias(old_id)
-  require('conform').format()
-
-  -- TODO: Update frontmatter to have current_title as first alias, needs to be done after the rename command has been run
 end
 
 return module
