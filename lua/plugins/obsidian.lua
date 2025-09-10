@@ -98,7 +98,14 @@ return {
           prompt_title = 'Obsidian Snippets',
         }
       end,
-      desc = '[O]bsidian: [S]nippets',
+      desc = '[O]bsidian [S]nippets',
+    },
+    {
+      '<leader>om',
+      function()
+        require('obsidian_zettelkasten_migration').migrate_file()
+      end,
+      desc = '[O]bsidian [M]igrate note to Zettelkasten',
     },
   },
 }
