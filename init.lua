@@ -973,5 +973,5 @@ vim.keymap.set('n', '<leader>ft', require('tekken_format').format_tekken_move, {
 vim.keymap.set('n', '<leader>ftk', require('tekken_picker').pick, { desc = '[F]ind [T]e[K]ken' })
 
 vim.api.nvim_create_user_command('ObsidianUpgrade', function()
-  require('obsidian_zetelkasten_transform').transform_file()
-end, { desc = 'Transforms the obsidian file to zetelkasten format. Need to execute :wa after?' })
+  require('obsidian_zettelkasten_migration').migrate_file()
+end, { desc = 'Migrates the currently open Obsidian file to zetelkasten format.' })
