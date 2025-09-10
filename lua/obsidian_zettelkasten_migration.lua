@@ -1,8 +1,8 @@
 -- Migrates the currently open Obsidian file to Zettelkasten format.
 
 local module = {}
-local function generate_zetelkasten_id()
-  -- mimic the oen from obsidian-nvim/obsidian.nvim (not super important)
+local function generate_zettelkasten_id()
+  -- simple mimic the one from obsidian-nvim/obsidian.nvim
   local suffix = ''
   for _ = 1, 4 do -- append 4 random uppercase letters
     suffix = suffix .. string.char(math.random(65, 90))
@@ -26,13 +26,13 @@ end
 
 module.migrate_file = function()
   local old_id = vim.fn.expand '%:t:r'
-  local new_id = generate_zetelkasten_id()
+  local new_id = generate_zettelkasten_id()
   if new_id == nil then
     return
   end
 
   vim.cmd('Obsidian rename ' .. new_id)
-  vim.cmd 'wa' -- ensure backlink updates are written, see the README
+  vim.cmd 'wa' -- ensure backlink updates are written, see the [README](https://github.com/obsidian-nvim/obsidian.nvim/blob/db08b881b287cc3d50131a0c9d3b3bf4e5794218/README.md?plain=1#L108)
 
   update_frontmatter_alias(old_id)
 end
