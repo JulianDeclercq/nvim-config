@@ -29,7 +29,7 @@ local function update_frontmatter_alias(old_title)
   end
 end
 
-module.transform_file = function()
+module.migrate_file = function()
   -- get the current file and save it as a new file
   local old_id = vim.fn.expand '%:t:r'
   local new_id = generate_zetelkasten_id()
