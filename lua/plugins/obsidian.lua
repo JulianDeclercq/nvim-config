@@ -101,11 +101,11 @@ return {
       desc = '[O]bsidian [S]nippets',
     },
     {
-      '<leader>om',
+      '<leader>oz',
       function()
         require('obsidian_zettelkasten_migration').migrate_file()
       end,
-      desc = '[O]bsidian [M]igrate note to Zettelkasten',
+      desc = '[O]bsidian migrate note to [Z]ettelkasten',
     },
   },
 }

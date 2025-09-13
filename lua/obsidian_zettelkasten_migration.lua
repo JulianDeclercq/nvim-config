@@ -12,7 +12,7 @@ local function generate_zettelkasten_id()
 end
 
 local function update_frontmatter_alias(old_title)
-  local buf = 0 -- is this correct?
+  local buf = 0
   for i = 1, vim.api.nvim_buf_line_count(buf) do
     local line = vim.api.nvim_buf_get_lines(buf, i - 1, i, false)[1]
     if line and line:find '^aliases:%s*%[' then
