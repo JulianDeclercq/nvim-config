@@ -971,3 +971,7 @@ vim.api.nvim_create_autocmd('User', {
 
 vim.keymap.set('n', '<leader>ft', require('tekken_format').format_tekken_move, { desc = '[F]ormat [T]ekken Move' })
 vim.keymap.set('n', '<leader>ftk', require('tekken_picker').pick, { desc = '[F]ind [T]e[K]ken' })
+
+vim.api.nvim_create_user_command('ZettelMigrateAlias', function()
+  require('gpt_obsidian_migration').migrate_current_file_with_alias_links()
+end, {})
