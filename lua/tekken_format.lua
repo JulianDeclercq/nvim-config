@@ -85,7 +85,7 @@ local function replace_word_under_cursor(target)
   vim.cmd 'normal! "zp"' -- paste over the selection
 end
 
-function module.format_tekken_move()
+function module.format_tekken_docs_link()
   local move = vim.fn.expand '<cWORD>'
   local character = get_character_name()
   if character == nil then
