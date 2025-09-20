@@ -69,7 +69,7 @@ end
 ---@param move string
 ---@param remove_plus boolean | nil
 ---@return string
-local function create_link_base(move, remove_plus)
+local function sanitize_move_input(move, remove_plus)
   move = move:gsub('cd', 'f,n,d,df') -- replace crouch dash
   move = move:gsub(',', '%%2C') -- encode comma
   if remove_plus then
@@ -80,21 +80,6 @@ local function create_link_base(move, remove_plus)
   return move
 end
 
-local function create_link_tekken_docs(character, move)
-  -- https://tekkendocs.com/t8/law/1,2,2,12
-  local base = create_link_base(move, true)
-  local link = ('https://tekkendocs.com/t8/%s/%s'):format(character, base)
-  return ('[%s](%s)'):format(move, link)
-end
-
-local function create_link_okizeme(character, move)
-  --https://okizeme.gg/database/anna/H.f%2Cf%2CF%2B3%2C2
-  local base = create_link_base(move, false)
-  -- local link = 'https://okizeme.gg/database/anna/H.f%2Cf%2CF%2B3%2C2'
-  local link = ('https://okizeme.gg/database/%s/%s'):format(character:lower(), base)
-  return ('[%s](%s)'):format(move, link)
-end
-
 ---@param target string
 local function replace_word_under_cursor(target)
   vim.cmd 'normal! viW' -- visual select inner word
@@ -102,27 +87,31 @@ local function replace_word_under_cursor(target)
   vim.cmd 'normal! "zp"' -- paste over the selection
 end
 
-function module.tekken_docs_link()
+local function create_link(link_formatter)
   local move = vim.fn.expand '<cWORD>'
   local character = get_character_name()
   if character == nil then
     return
   end
 
-  local link = create_link_tekken_docs(character, move)
+  local link = link_formatter(character, move)
   replace_word_under_cursor(link)
 end
 
--- TODO Use base function and share it with format_tekken_docs_link
-function module.okizeme_link()
-  local move = vim.fn.expand '<cWORD>'
-  local character = get_character_name()
-  if character == nil then
-    return
-  end
+function module.tekken_docs_link()
+  create_link(function(character, move)
+    local base = sanitize_move_input(move, true)
+    local link = ('https://tekkendocs.com/t8/%s/%s'):format(character, base)
+    return ('[%s](%s)'):format(move, link)
+  end)
+end
 
-  local link = create_link_okizeme(character, move)
-  replace_word_under_cursor(link)
+function module.okizeme_link()
+  create_link(function(character, move)
+    local base = sanitize_move_input(move, false)
+    local link = ('https://okizeme.gg/database/%s/%s'):format(character:lower(), base)
+    return ('[%s](%s)'):format(move, link)
+  end)
 end
 
 return module
