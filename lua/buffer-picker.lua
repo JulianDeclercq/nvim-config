@@ -51,9 +51,11 @@ function module.pick()
       if vim.startswith(name, paths.obsidian) then
         local obsidian_name = get_obsidian_name(buf)
         if obsidian_name ~= '' then
-          displayName = vim.fn.fnamemodify(name, ':t') .. obsidian_name
+          -- displayName = vim.fn.fnamemodify(name, ':t') .. obsidian_name -- include the filename, disabled for now
+          displayName = obsidian_name
         end
       end
+
       table.insert(entries, {
         value = buf,
         ordinal = name,
