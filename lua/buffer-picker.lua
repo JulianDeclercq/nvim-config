@@ -47,22 +47,23 @@ function module.pick()
     if vim.api.nvim_buf_is_loaded(buf) then
       local name = vim.api.nvim_buf_get_name(buf)
       local displayName = name ~= '' and name or ('[No Name] ' .. buf)
+      local ordinal = displayName
 
       if vim.startswith(name, paths.obsidian) then
         local obsidian_name = get_obsidian_name(buf)
         if obsidian_name ~= '' then
-          -- displayName = vim.fn.fnamemodify(name, ':t') .. obsidian_name -- include the filename, disabled for now
           displayName = obsidian_name
+          ordinal = vim.fn.fnamemodify(name, ':t') .. obsidian_name -- include the filename
         end
       end
 
       table.insert(entries, {
         value = buf,
-        ordinal = name,
+        ordinal = ordinal,
         path = name,
         display = function()
           return displayer {
-            { tostring(buf), 'TelescopeResultsNumber' }, -- shows bufnr
+            { tostring(buf), 'TelescopeResultsNumber' }, -- shows bufnr, TeleScopeResultsNumber is the highlight group used for color coding
             { displayName },
           }
         end,
