@@ -1,13 +1,6 @@
 -- Make sure to install RipGrep
--- Platform specific paths
-local obsidian_path
-if vim.fn.has 'macunix' == 1 then
-  obsidian_path = '/Users/Julian/Repositories/obsidian'
-elseif vim.fn.has 'win32' == 1 then
-  obsidian_path = 'C:\\Users\\Julian\\Documents\\The Cache'
-else
-  obsidian_path = vim.fn.expand '~' .. '/Repositories/obsidian'
-end
+
+local paths = require 'config.paths'
 
 return {
   'obsidian-nvim/obsidian.nvim',
@@ -22,7 +15,7 @@ return {
     workspaces = {
       {
         name = 'vault',
-        path = obsidian_path,
+        path = paths.obsidian,
       },
     },
     -- note_id_func = noteIdFunction,

@@ -72,6 +72,8 @@ end
 local function sanitize_move_input(move, remove_plus)
   move = move:gsub('cd', 'f,n,d,df') -- replace crouch dash
   move = move:gsub(',', '%%2C') -- encode comma
+  move = move:gsub('~', '%%7E') -- encode tilde
+  move = move:gsub('*', '%%2A') -- encode asterix
   if remove_plus then
     move = move:gsub('%+', '') -- remove plus
   else
