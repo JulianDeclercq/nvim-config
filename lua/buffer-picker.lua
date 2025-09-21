@@ -37,20 +37,21 @@ function module.pick()
   local displayer = entry_display.create {
     separator = ' ',
     items = {
-      { width = 4 }, -- bufnr
-      { remaining = true }, -- filename
+      { width = 4 }, -- bufnr with fixed with
+      { remaining = true }, -- filename gets the rest of the space available
     },
   }
 
   local entries = {}
-  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-    if vim.api.nvim_buf_is_loaded(buf) then
-      local name = vim.api.nvim_buf_get_name(buf)
-      local displayName = name ~= '' and name or ('[No Name] ' .. buf)
+  for _, bufinfo in ipairs(vim.fn.getbufinfo { buflisted = 1, bufloaded = 1 }) do
+    local bufNr = bufinfo.bufnr
+    if vim.api.nvim_buf_is_loaded(bufNr) then
+      local name = vim.api.nvim_buf_get_name(bufNr)
+      local displayName = name ~= '' and name or ('[No Name] ' .. bufNr)
       local ordinal = displayName
 
       if vim.startswith(name, paths.obsidian) then
-        local obsidian_name = get_obsidian_name(buf)
+        local obsidian_name = get_obsidian_name(bufNr)
         if obsidian_name ~= '' then
           displayName = obsidian_name
           ordinal = vim.fn.fnamemodify(name, ':t') .. obsidian_name -- include the filename
@@ -58,12 +59,12 @@ function module.pick()
       end
 
       table.insert(entries, {
-        value = buf,
+        value = bufNr,
         ordinal = ordinal,
         path = name,
         display = function()
           return displayer {
-            { tostring(buf), 'TelescopeResultsNumber' }, -- shows bufnr, TeleScopeResultsNumber is the highlight group used for color coding
+            { tostring(bufNr), 'TelescopeResultsNumber' }, -- shows bufnr, TeleScopeResultsNumber is the highlight group used for color coding
             { displayName },
           }
         end,
