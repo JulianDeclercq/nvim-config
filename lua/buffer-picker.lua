@@ -2,17 +2,6 @@ local module = {}
 
 local paths = require 'config.paths'
 
-local function get_first_alias(bufnr)
-  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, 20, false)
-  for i, line in ipairs(lines) do
-    if vim.startswith(line, 'aliases') then
-      return lines[i + 1]
-    end
-  end
-
-  return ''
-end
-
 local function get_obsidian_name(bufnr)
   -- get first alias
   local alias = ''
