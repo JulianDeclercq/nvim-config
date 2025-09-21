@@ -489,8 +489,11 @@ require('lazy').setup({
 
       ls.add_snippets('all', {
         ls.snippet({
-          trig = 'charactermoc',
-          hidden = true, -- hide from autocomplete, so you'll have to either expand it through the trigger + expand keybind or find it through telescope
+          trig = 'character',
+          -- hide from autocomplete,
+          -- so you'll have to either expand it through the trigger + expand keybind
+          -- or find it through telescope
+          hidden = true,
         }, {
           ls.text_node {
             '# CHARACTERNAME MOC',
@@ -500,15 +503,15 @@ require('lazy').setup({
           },
         }),
         ls.snippet({
-          trig = 'fight',
+          trig = 'combo',
           hidden = true,
         }, {
           ls.text_node {
             '```fight',
             'input:',
-            'name:',
-            'damage:',
-            'hits:',
+            'name: Combo',
+            'damage: 1',
+            'hits: 1',
             '```',
           },
         }),
@@ -517,7 +520,7 @@ require('lazy').setup({
   },
   { -- Autocompletion
     'saghen/blink.cmp',
-    build = 'cargo +nightly build --release',
+    build = is_windows and nil or 'cargo +nightly build --release', -- my rust toolchain is wonky on Windows so let's just not build
     event = 'VimEnter',
     version = '1.*',
     dependencies = {
@@ -969,6 +972,11 @@ vim.api.nvim_create_autocmd('User', {
   end,
 })
 
-vim.keymap.set('n', '<leader>tk', require('tekken_format').format_tekken_move, { desc = '[T]e[K]ken Move' })
+vim.keymap.set('n', '<leader>td', require('tekken_format').tekken_docs_link, { desc = 'Format [T]ekken [D]ocs link' })
+vim.keymap.set('n', '<leader>to', require('tekken_format').okizeme_link, { desc = 'Format [T[ekken [O]kizeme link' })
 vim.keymap.set('n', '<leader>ftk', require('tekken_picker').pick, { desc = '[F]ind [T]e[K]ken' })
 vim.keymap.set('n', '<leader><leader>', require('buffer-picker').pick, { desc = '[ ] Find existing buffers' })
+
+vim.api.nvim_create_user_command('ZettelMigrateAlias', function()
+  require('gpt_obsidian_migration').migrate_current_file_with_alias_links()
+end, {})
