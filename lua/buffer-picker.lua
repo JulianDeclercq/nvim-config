@@ -2,13 +2,15 @@ local module = {}
 
 local paths = require 'config.paths'
 
+---@param bufnr number
+---@return string
 local function get_obsidian_name(bufnr)
   -- get first alias
   local alias = ''
   local lines = vim.api.nvim_buf_get_lines(bufnr, 0, 20, false)
   for i, line in ipairs(lines) do
     if vim.startswith(line, 'aliases') then
-      alias = lines[i + 1]
+      alias = lines[i + 1]:match '%- (.+)%s*$' -- only keep the alias itself, remove all else from the line
     end
   end
 
