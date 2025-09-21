@@ -517,7 +517,7 @@ require('lazy').setup({
   },
   { -- Autocompletion
     'saghen/blink.cmp',
-    build = 'cargo +nightly build --release',
+    build = is_windows and nil or 'cargo +nightly build --release', -- my rust toolchain is wonky on Windows so let's just not build
     event = 'VimEnter',
     version = '1.*',
     dependencies = {
