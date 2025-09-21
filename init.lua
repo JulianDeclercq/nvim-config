@@ -489,8 +489,11 @@ require('lazy').setup({
 
       ls.add_snippets('all', {
         ls.snippet({
-          trig = 'charactermoc',
-          hidden = true, -- hide from autocomplete, so you'll have to either expand it through the trigger + expand keybind or find it through telescope
+          trig = 'character',
+          -- hide from autocomplete,
+          -- so you'll have to either expand it through the trigger + expand keybind
+          -- or find it through telescope
+          hidden = true,
         }, {
           ls.text_node {
             '# CHARACTERNAME MOC',
@@ -500,15 +503,15 @@ require('lazy').setup({
           },
         }),
         ls.snippet({
-          trig = 'fight',
+          trig = 'combo',
           hidden = true,
         }, {
           ls.text_node {
             '```fight',
             'input:',
-            'name:',
-            'damage:',
-            'hits:',
+            'name: Combo',
+            'damage: 1',
+            'hits: 1',
             '```',
           },
         }),
