@@ -37,8 +37,9 @@ function module.pick()
   local displayer = entry_display.create {
     separator = ' ',
     items = {
-      { width = 4 }, -- bufnr with fixed with
-      { remaining = true }, -- filename gets the rest of the space available
+      { width = 4 }, -- buf number
+      { width = 2 }, -- buf icon
+      { remaining = true }, -- filename (gets the rest of the space available)
     },
   }
 
@@ -46,25 +47,29 @@ function module.pick()
   for _, bufinfo in ipairs(vim.fn.getbufinfo { buflisted = 1, bufloaded = 1 }) do
     local bufNr = bufinfo.bufnr
     if vim.api.nvim_buf_is_loaded(bufNr) then
-      local name = vim.api.nvim_buf_get_name(bufNr)
-      local displayName = name ~= '' and name or ('[No Name] ' .. bufNr)
+      local bufferName = vim.api.nvim_buf_get_name(bufNr)
+      local displayName = bufferName ~= '' and bufferName or ('[No Name] ' .. bufNr)
       local ordinal = displayName
 
-      if vim.startswith(name, paths.obsidian) then
+      local icon, icon_highlight_group = require('nvim-web-devicons').get_icon(bufferName, vim.fn.fnamemodify(bufferName, ':e'), { default = true })
+
+      if vim.startswith(bufferName, paths.obsidian) then
         local obsidian_name = get_obsidian_name(bufNr)
         if obsidian_name ~= '' then
           displayName = obsidian_name
-          ordinal = vim.fn.fnamemodify(name, ':t') .. obsidian_name -- include the filename
+          ordinal = vim.fn.fnamemodify(bufferName, ':t') .. obsidian_name -- include the filename
+          icon = '\u{F219}' -- 
         end
       end
 
       table.insert(entries, {
         value = bufNr,
         ordinal = ordinal,
-        path = name,
+        path = bufferName,
         display = function()
           return displayer {
             { tostring(bufNr), 'TelescopeResultsNumber' }, -- shows bufnr, TeleScopeResultsNumber is the highlight group used for color coding
+            { icon, icon_highlight_group },
             { displayName },
           }
         end,
