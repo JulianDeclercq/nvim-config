@@ -75,7 +75,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
     -- vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
     vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = '[F]ind existing [B]uffers' })
     vim.keymap.set('n', '<leader>fof', "<Cmd>lua require('telescope.builtin').oldfiles()<CR>", { noremap = true, silent = true, desc = '[F]ind [O]ld [F]iles' })
-    vim.keymap.set('n', '<leader>fbm', '<Cmd>Telescope bookmarks list<CR>', { desc = '[F]ind [B]ookmarks' })
+    vim.keymap.set('n', '<leader>fbm', require('bookmark-utils').open_bookmarks_picker, { desc = '[F]ind [B]ookmarks' })
 
     -- Slightly advanced example of overriding default behavior and theme
     vim.keymap.set('n', '<leader>/', function()
