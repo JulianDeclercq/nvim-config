@@ -48,7 +48,7 @@ function module.pick()
     local bufNr = bufinfo.bufnr
     if vim.api.nvim_buf_is_loaded(bufNr) then
       local bufferName = vim.api.nvim_buf_get_name(bufNr)
-      local displayName = bufferName ~= '' and bufferName or ('[No Name] ' .. bufNr)
+      local displayName = bufferName ~= '' and vim.fn.fnamemodify(bufferName, ':p:.') or ('[No Name] ' .. bufNr)
       local ordinal = displayName
 
       local icon, icon_highlight_group = require('nvim-web-devicons').get_icon(bufferName, vim.fn.fnamemodify(bufferName, ':e'), { default = true })
