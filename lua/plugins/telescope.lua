@@ -75,7 +75,58 @@ return { -- Fuzzy Finder (files, lsp, etc)
     -- vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
     vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = '[F]ind existing [B]uffers' })
     vim.keymap.set('n', '<leader>fof', "<Cmd>lua require('telescope.builtin').oldfiles()<CR>", { noremap = true, silent = true, desc = '[F]ind [O]ld [F]iles' })
-    vim.keymap.set('n', '<leader>fbm', '<Cmd>Telescope bookmarks list<CR>', { desc = '[F]ind [B]ookmarks' })
+    vim.keymap.set('n', '<leader>fbm', function()
+      require('telescope').extensions.bookmarks.list({
+        attach_mappings = function(prompt_bufnr, map)
+          vim.notify('DEBUG: attach_mappings called!', vim.log.levels.INFO)
+          local actions = require('telescope.actions')
+          local action_state = require('telescope.actions.state')
+
+          -- Function to delete bookmark with debug info
+          local delete_bookmark = function()
+            vim.notify('DEBUG: Delete function triggered!', vim.log.levels.INFO)
+            local selection = action_state.get_selected_entry()
+            vim.notify('DEBUG: Selection: ' .. vim.inspect(selection), vim.log.levels.INFO)
+
+            if selection then
+              vim.notify('DEBUG: Deleting bookmark at ' .. selection.filename .. ' line ' .. selection.lnum, vim.log.levels.INFO)
+              
+              -- Close the picker first
+              actions.close(prompt_bufnr)
+              
+              -- Store current buffer to return to it
+              local current_buf = vim.api.nvim_get_current_buf()
+              
+              -- Open file in background buffer (without showing it)
+              local buf = vim.fn.bufnr(selection.filename, true) -- Create buffer if doesn't exist
+              vim.fn.bufload(buf) -- Load the buffer
+              
+              -- Temporarily switch to the buffer
+              vim.api.nvim_set_current_buf(buf)
+              vim.api.nvim_win_set_cursor(0, {selection.lnum, 0})
+              
+              -- Toggle the bookmark (delete it)
+              require('bookmarks').bookmark_toggle()
+              
+              -- Switch back to original buffer
+              vim.api.nvim_set_current_buf(current_buf)
+              
+              -- Wait a moment then reopen the picker to show updated list
+              vim.defer_fn(function()
+                require('telescope').extensions.bookmarks.list()
+              end, 100)
+            else
+              vim.notify('DEBUG: No selection found!', vim.log.levels.WARN)
+            end
+          end
+
+          -- Map `dd` in both insert and normal mode
+          map('n', 'dd', delete_bookmark)
+
+          return true
+        end,
+      })
+    end, { desc = '[F]ind [B]ookmarks' })
 
     -- Slightly advanced example of overriding default behavior and theme
     vim.keymap.set('n', '<leader>/', function()
