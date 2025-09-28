@@ -52,13 +52,18 @@ local function is_valid_character(character)
   return character_set[character:lower()] or false
 end
 
-local function get_character_name()
+local function get_closest_character_name()
   local buf = 0
-  for i = 1, vim.api.nvim_buf_line_count(buf) do
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local line_nr = cursor[1]
+
+  for i = line_nr, 1, -1 do
     local line = vim.api.nvim_buf_get_lines(buf, i - 1, i, false)[1]
     for word in string.gmatch(line, '([^%s]+)') do
-      if is_valid_character(word) then
-        return word
+      -- normalize: strip "'s" at the end and remove trailing non-alphabetic characters
+      local cleaned = word:gsub("'s$", ''):gsub('[^%w]+$', '')
+      if is_valid_character(cleaned) then
+        return cleaned
       end
     end
   end
@@ -91,7 +96,7 @@ end
 
 local function create_link(link_formatter)
   local move = vim.fn.expand '<cWORD>'
-  local character = get_character_name()
+  local character = get_closest_character_name()
   if character == nil then
     return
   end
