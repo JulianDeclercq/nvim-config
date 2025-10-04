@@ -30,6 +30,9 @@ vim.opt.confirm = true -- If performing an operation that would fail due to unsa
 vim.opt.history = 100 -- how many `:` commands and messages are kept
 vim.opt.fixeol = false -- don't add a final newline
 
+-- Keep paste register intact when pasting over a visual selection
+vim.keymap.set('x', 'p', [["_dP]], { desc = 'Paste without yanking replaced text' })
+
 local is_windows = (vim.loop.os_uname().sysname == 'Windows_NT')
 
 if not is_windows then
