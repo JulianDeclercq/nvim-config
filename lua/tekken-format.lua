@@ -91,7 +91,7 @@ end
 local function replace_word_under_cursor(target)
   vim.cmd 'normal! viW' -- visual select inner word
   vim.fn.setreg('z', target) -- put the target in a temp register
-  vim.cmd 'normal! "zp"' -- paste over the selection
+  vim.cmd 'normal! "_d"zP' -- paste over the selection without yanking the word to default register
 end
 
 local function create_link(link_formatter)
