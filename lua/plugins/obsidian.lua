@@ -4,7 +4,9 @@ local paths = require 'config.paths'
 
 return {
   'obsidian-nvim/obsidian.nvim',
-  version = '*', -- use latest release
+  -- 'JulianDeclercq/obsidian.nvim',
+  -- version = '*', -- use latest release
+  branch = 'main',
   lazy = true,
   dependencies = {
     'nvim-lua/plenary.nvim',
