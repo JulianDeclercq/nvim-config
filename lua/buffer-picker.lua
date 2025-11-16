@@ -2,6 +2,12 @@ local module = {}
 
 local paths = require 'config.paths'
 
+---@param s string
+---@return boolean
+local function is_empty(s)
+  return s == nil or s == ''
+end
+
 ---@param bufnr number
 ---@return string
 local function get_obsidian_name(bufnr)
@@ -14,7 +20,7 @@ local function get_obsidian_name(bufnr)
     end
   end
 
-  if alias == '' then
+  if is_empty(alias) then
     return ''
   end
 
@@ -55,7 +61,7 @@ function module.pick()
 
       if vim.startswith(bufferName, paths.obsidian) then
         local obsidian_name = get_obsidian_name(bufNr)
-        if obsidian_name ~= '' then
+        if not is_empty(obsidian_name) then
           displayName = obsidian_name
           ordinal = vim.fn.fnamemodify(bufferName, ':t') .. obsidian_name -- include the filename
           icon = '\u{F219}' -- 

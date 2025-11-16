@@ -6,19 +6,20 @@ local function is_valid_character(character)
   local characters = {
     'alisa',
     'anna',
+    'armor-king',
     'asuka',
     'azucena',
     'bryan',
     'claudio',
     'clive',
-    'devil Jin',
+    'devil-jin',
     'dragunov',
     'eddy',
     'fahkumram',
     'feng',
     'heihachi',
     'hwoarang',
-    'jack 8',
+    'jack-8',
     'jin',
     'jun',
     'kazuya',
@@ -60,8 +61,12 @@ local function get_closest_character_name()
   for i = line_nr, 1, -1 do
     local line = vim.api.nvim_buf_get_lines(buf, i - 1, i, false)[1]
     for word in string.gmatch(line, '([^%s]+)') do
-      -- normalize: strip "'s" at the end and remove trailing non-alphabetic characters
-      local cleaned = word:gsub("'s$", ''):gsub('[^%w]+$', '')
+      -- normalize: remove possessive 's and strip non-alphanumeric chars on both ends
+      local cleaned = word
+        :gsub("'s$", '') -- remove trailing "'s" (e.g., "King's" → "King")
+        :gsub('^[^%w]+', '') -- remove leading non-alphanumeric chars (e.g., "(King" → "King")
+        :gsub('[^%w]+$', '') -- remove trailing non-alphanumeric chars (e.g., "King)" → "King")
+
       if is_valid_character(cleaned) then
         return cleaned
       end

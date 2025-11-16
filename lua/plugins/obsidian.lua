@@ -3,10 +3,15 @@
 local paths = require 'config.paths'
 
 return {
-  'obsidian-nvim/obsidian.nvim',
+  -- Use kostabekre's version until https://github.com/obsidian-nvim/obsidian.nvim/pull/142/files is merged for the alias searching support
+  'kostabekre/obsidian.nvim',
+  -- COMMUNITY FORK
+  -- 'obsidian-nvim/obsidian.nvim',
+  -- commit = '2d44b29dc71c26296cb6f267d0a615ec1ada908f',
+  -- PERSONAL
   -- 'JulianDeclercq/obsidian.nvim',
   -- version = '*', -- use latest release
-  branch = 'main',
+  -- branch = 'main',
   lazy = true,
   dependencies = {
     'nvim-lua/plenary.nvim',
