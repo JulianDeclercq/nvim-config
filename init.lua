@@ -118,7 +118,7 @@ vim.keymap.set('v', '<leader>w', '<C-w>', { noremap = true, silent = true, desc 
 vim.keymap.set('n', '<leader>h', '<C-w>h', { desc = 'Go to left window' })
 vim.keymap.set('n', '<leader>j', '<C-w>j', { desc = 'Go to lower window' })
 -- vim.keymap.set('n', '<leader>k', '<C-w>k', { desc = 'Go to upper window' }) -- commented since I want to use it for hover info for now
-vim.keymap.set('n', '<leader>l', '<C-w>l', { desc = 'Go to right window' })
+-- vim.keymap.set('n', '<leader>l', '<C-w>l', { desc = 'Go to right window' }) -- commented since I want to use it for lua stuff for now
 
 -- Highlight when yanking (copying) text
 vim.api.nvim_create_autocmd('TextYankPost', {
@@ -142,7 +142,6 @@ end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
-  { import = 'plugins' },
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
   { -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
@@ -325,6 +324,10 @@ require('lazy').setup({
 
       local capabilities = require('blink.cmp').get_lsp_capabilities()
 
+      -- Compute LÖVE library paths for lua_ls
+      local love2d_library_path = vim.fn.stdpath('data') .. '/lazy/love2d.nvim/love2d/library'
+      local luasocket_library_path = vim.fn.stdpath('data') .. '/lazy/love2d.nvim/luasocket/library'
+
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
       --
@@ -373,6 +376,22 @@ require('lazy').setup({
             Lua = {
               completion = {
                 callSnippet = 'Replace',
+              },
+              diagnostics = {
+                globals = { 'love' },
+              },
+              runtime = {
+                version = 'LuaJIT', -- LÖVE uses LuaJIT (Lua 5.1)
+              },
+              workspace = {
+                library = {
+                  -- Add love2d.nvim library paths for LÖVE API definitions
+                  vim.fn.expand('$VIMRUNTIME/lua'),
+                  vim.fn.expand('$VIMRUNTIME/lua/vim/lsp'),
+                  love2d_library_path,
+                  luasocket_library_path,
+                },
+                checkThirdParty = false,
               },
             },
           },
@@ -728,10 +747,361 @@ require('lazy').setup({
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --  Julle: the syntax 'kickstart.plugins.WHATEVER' is a directory name pretty much. Check the kickstart.plugin directory or look for lint/autopair files through telescope <leader>tn.
   --
-  -- require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
-  require 'kickstart.plugins.lint',
-  require 'kickstart.plugins.autopairs',
+  -- Linting configuration (from kickstart.plugins.lint)
+  {
+    'mfussenegger/nvim-lint',
+    event = { 'BufReadPre', 'BufNewFile' },
+    config = function()
+      -- configure diagnostics display
+      vim.diagnostic.config {
+        signs = true,
+        underline = true,
+        update_in_insert = false,
+        virtual_text = false,
+        severity_sort = true,
+      }
+
+      local lint = require 'lint'
+
+      -- explicitly load the built-in linters
+      lint.linters.eslint = require 'lint.linters.eslint'
+      lint.linters.stylelint = require 'lint.linters.stylelint'
+
+      -- filetypes → linters
+      lint.linters_by_ft = {
+        -- JavaScript / TypeScript
+        typescript = { 'eslint' },
+        typescriptreact = { 'eslint' },
+        javascript = { 'eslint' },
+        javascriptreact = { 'eslint' },
+
+        -- Stylesheets
+        css = { 'stylelint' },
+        scss = { 'stylelint' },
+        less = { 'stylelint' },
+
+        -- Markup / Single-file components
+        html = { 'eslint', 'stylelint' },
+
+        -- Lua
+        -- lua = { 'luacheck' },
+      }
+
+      -- lint on save
+      vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
+        callback = function()
+          require('lint').try_lint()
+        end,
+      })
+    end,
+  },
+  -- Autopairs configuration (from kickstart.plugins.autopairs)
+  {
+    'windwp/nvim-autopairs',
+    event = 'InsertEnter',
+    opts = {},
+  },
+  -- Telescope configuration (from plugins.telescope)
+  { -- Fuzzy Finder (files, lsp, etc)
+    'nvim-telescope/telescope.nvim',
+    event = 'VimEnter',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      {
+        'nvim-telescope/telescope-fzf-native.nvim',
+        build = 'make',
+        cond = function()
+          return vim.fn.executable 'make' == 1
+        end,
+      },
+      { 'nvim-telescope/telescope-ui-select.nvim' },
+      -- Useful for getting pretty icons, but requires a Nerd Font.
+      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+    },
+    config = function()
+      -- Telescope is a fuzzy finder that comes with a lot of different things that
+      -- it can fuzzy find! It's more than just a "file finder", it can search
+      -- many different aspects of Neovim, your workspace, LSP, and more!
+      --
+      -- The easiest way to use Telescope, is to start by doing something like:
+      --  :Telescope help_tags
+      --
+      -- After running this command, a window will open up and you're able to
+      -- type in the prompt window. You'll see a list of `help_tags` options and
+      -- a corresponding preview of the help.
+      --
+      -- Two important keymaps to use while in Telescope are:
+      --  - Insert mode: <c-/>
+      --  - Normal mode: ?
+      --
+      -- This opens a window that shows you all of the keymaps for the current
+      -- Telescope picker. This is really useful to discover what Telescope can
+      -- do as well as how to actually do it!
+
+      -- [[ Configure Telescope ]]
+      -- See `:help telescope` and `:help telescope.setup()`
+      require('telescope').setup {
+        extensions = {
+          ['ui-select'] = {
+            require('telescope.themes').get_dropdown(),
+          },
+        },
+        -- allow deleting buffers when Telescope is picking inside Builtin.Buffers
+        pickers = {
+          buffers = {
+            mappings = {
+              n = {
+                ['dd'] = require('telescope.actions').delete_buffer,
+              },
+            },
+          },
+        },
+      }
+
+      -- Enable Telescope extensions if they are installed
+      pcall(require('telescope').load_extension, 'fzf')
+      pcall(require('telescope').load_extension, 'ui-select')
+      pcall(require('telescope').load_extension, 'luasnip')
+      pcall(require('telescope').load_extension, 'bookmarks')
+
+      -- See `:help telescope.builtin`
+      local builtin = require 'telescope.builtin'
+      vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = '[F]ind [H]elp' })
+      vim.keymap.set('n', '<leader>fk', builtin.keymaps, { desc = '[F]ind [K]eymaps' })
+      vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = '[F]ind [F]iles' })
+      -- vim.keymap.set('n', '<leader>fs', builtin.builtin, { desc = '[F]ind [S]elect Telescope' })
+      vim.keymap.set('n', '<leader>fs', '<Cmd>Telescope luasnip<CR>', { desc = '[F]ind [S]nippets' })
+      vim.keymap.set('n', '<leader>fw', builtin.grep_string, { desc = '[F]ind current [W]ord' })
+      vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = '[F]ind by [G]rep' })
+      vim.keymap.set('n', '<leader>fd', builtin.diagnostics, { desc = '[F]ind [D]iagnostics' })
+      vim.keymap.set('n', '<leader>fr', builtin.resume, { desc = '[F]ind [R]esume' })
+      vim.keymap.set('n', '<leader>f.', builtin.oldfiles, { desc = '[F]ind Recent Files ("." for repeat)' })
+      -- vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+      vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = '[F]ind existing [B]uffers' })
+      vim.keymap.set('n', '<leader>fof', "<Cmd>lua require('telescope.builtin').oldfiles()<CR>", { noremap = true, silent = true, desc = '[F]ind [O]ld [F]iles' })
+      vim.keymap.set('n', '<leader>fbm', require('bookmark-utils').open_bookmarks_picker, { desc = '[F]ind [B]ookmarks' })
+
+      -- Slightly advanced example of overriding default behavior and theme
+      vim.keymap.set('n', '<leader>/', function()
+        -- You can pass additional configuration to Telescope to change the theme, layout, etc.
+        builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+          winblend = 10,
+          previewer = false,
+        })
+      end, { desc = '[/] Fuzzily search in current buffer' })
+
+      -- It's also possible to pass additional configuration options.
+      --  See `:help telescope.builtin.live_grep()` for information about particular keys
+      vim.keymap.set('n', '<leader>s/', function()
+        builtin.live_grep {
+          grep_open_files = true,
+          prompt_title = 'Live Grep in Open Files',
+        }
+      end, { desc = '[F]ind [/] in Open Files' })
+
+      -- Shortcut for searching your Neovim configuration files
+      vim.keymap.set('n', '<leader>fn', function()
+        builtin.find_files { cwd = vim.fn.stdpath 'config' }
+      end, { desc = '[F]ind [N]eovim files' })
+    end,
+  },
+  -- Obsidian configuration (from plugins.obsidian)
+  {
+    -- Use kostabekre's version until https://github.com/obsidian-nvim/obsidian.nvim/pull/142/files is merged for the alias searching support
+    'kostabekre/obsidian.nvim',
+    -- COMMUNITY FORK
+    -- 'obsidian-nvim/obsidian.nvim',
+    -- commit = '2d44b29dc71c26296cb6f267d0a615ec1ada908f',
+    -- PERSONAL
+    -- 'JulianDeclercq/obsidian.nvim',
+    -- version = '*', -- use latest release
+    -- branch = 'main',
+    lazy = true,
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'hrsh7th/nvim-cmp', -- autocomplete for note references
+      'nvim-telescope/telescope.nvim', -- for snippet search
+    },
+    opts = {
+      workspaces = {
+        {
+          name = 'vault',
+          path = require('config.paths').obsidian,
+        },
+      },
+      -- note_id_func = noteIdFunction,
+      follow_url_func = function(url)
+        -- Open the URL in the default web browser.
+        vim.ui.open(url)
+      end,
+      -- Where to put new notes. Valid options are
+      --  * "current_dir" - put new notes in same directory as the current buffer.
+      --  * "notes_subdir" - put new notes in the default notes subdirectory.
+      new_notes_location = 'notes_subdir',
+      completion = {
+        nvim_cmp = false,
+        blink = true,
+        min_chars = 2,
+        file_popup = true,
+      },
+      ui = {
+        enable = false,
+      },
+      legacy_commands = false,
+      footer = {
+        enabled = false,
+      },
+    },
+    keys = {
+      {
+        '<leader>on',
+        '<Cmd>Obsidian new<CR>',
+        desc = '[O]bsidian: [N]ew Note',
+      },
+      {
+        '<leader>ol',
+        '<Cmd>Obsidian follow_link<CR>',
+        desc = '[O]bsidian: Follow [L]ink',
+      },
+      {
+        '<leader>oqs',
+        '<Cmd>Obsidian quick_switch<CR>',
+        desc = '[O]bsidian: [Q]uick [S]witch',
+      },
+      {
+        '<leader>of',
+        '<Cmd>Obsidian search<CR>',
+        desc = '[O]bsidian: [F]ind',
+      },
+      {
+        '<leader>og',
+        '<Cmd>Obsidian search<CR>',
+        desc = '[O]bsidian: [G]rep',
+      },
+      {
+        '<leader>oo',
+        '<Cmd>Obsidian open<CR>',
+        desc = '[O]bsidian: [O]pen',
+      },
+      {
+        '<leader>ob',
+        '<Cmd>Obsidian backlinks<CR>',
+        desc = '[O]bsidian [B]acklinks',
+      },
+      {
+        '<leader>ot',
+        '<Cmd>Obsidian today<CR>',
+        desc = '[O]bsidian [T]oday',
+      },
+      {
+        '<leader>os',
+        function()
+          require('telescope.builtin').find_files {
+            cwd = obsidian_path .. '/.obsidian/snippets',
+            hidden = true,
+            prompt_title = 'Obsidian Snippets',
+          }
+        end,
+        desc = '[O]bsidian [S]nippets',
+      },
+      {
+        '<leader>oz',
+        function()
+          require('obsidian_zettelkasten_migration').migrate_file()
+        end,
+        desc = '[O]bsidian migrate note to [Z]ettelkasten',
+      },
+    },
+  },
+  -- Bookmarks configuration (from plugins.bookmarks)
+  {
+    'tomasky/bookmarks.nvim',
+    dependencies = {}, -- telescope loads the extension, don't need to add as a dependency
+    -- version = '*',
+    branch = 'main',
+    lazy = true,
+    config = function()
+      local bm = require 'bookmarks'
+      bm.setup()
+
+      vim.keymap.set('n', '<leader>bmt', bm.bookmark_toggle, { desc = '[B]ook[m]ark [T]oggle' })
+      vim.keymap.set('n', '<leader>bmda', bm.bookmark_clear_all, { desc = '[B]ook[m]ark [D]elete [A]ll' })
+      -- Reference from documentation if I want to add some keymaps in the future
+      -- vim.keymap.set("n","mi",bm.bookmark_ann) -- add or edit mark annotation at current line
+      -- vim.keymap.set("n","mc",bm.bookmark_clean) -- clean all marks in local buffer
+      -- vim.keymap.set("n","mn",bm.bookmark_next) -- jump to next mark in local buffer
+      -- vim.keymap.set("n","mp",bm.bookmark_prev) -- jump to previous mark in local buffer
+      -- vim.keymap.set("n","ml",bm.bookmark_list) -- show marked file list in quickfix window
+      -- vim.keymap.set("n","mx",bm.bookmark_clear_all) -- removes all bookmarks
+    end,
+  },
+  -- Git Blame configuration (from plugins.git-blame)
+  {
+    'f-person/git-blame.nvim',
+    event = 'VeryLazy',
+    opts = {
+      enabled = false, -- disable by default
+      message_template = ' <summary> * <date> * <author> * <<sha>> ',
+      date_format = '%d-%m-%Y',
+    },
+    keys = {
+      {
+        '<leader>gb',
+        '<Cmd>GitBlameToggle<CR>',
+        desc = '[G]it [B]lame',
+      },
+    },
+  },
+  -- Love2D configuration (from plugins.love2d)
+  {
+    'S1M0N38/love2d.nvim',
+    event = 'VeryLazy',
+    version = '2.*',
+    opts = {
+      -- Ensure LSP integration is enabled
+      lsp = {
+        enabled = true,
+      },
+    },
+    keys = {
+      { '<leader>lr', '<cmd>LoveRun<cr>', ft = 'lua', desc = '[L]ÖVE [R]un' },
+      { '<leader>ls', '<cmd>LoveStop<cr>', ft = 'lua', desc = '[L]ÖVE [S]top' },
+    },
+  },
+  -- Notify configuration (from plugins.notify)
+  {
+    'rcarriga/nvim-notify',
+    version = '*',
+    lazy = true,
+    -- load early so any vim.notify() calls get routed through nvim-notify
+    event = 'VimEnter',
+    -- optionally expose the setup opts here
+    opts = {
+      -- e.g. timeout = 3000,
+      --      top_down = false,
+      --      stages = "fade_in_slide_out",
+    },
+    config = function(_, opts)
+      local notify = require 'notify'
+      notify.setup(opts)
+      -- override default vim.notify
+      vim.notify = notify
+    end,
+  },
+  -- Telescope LuaSnip configuration (from plugins.telescope-luasnip)
+  {
+    'benfowler/telescope-luasnip.nvim',
+    dependencies = { -- telescope loads the extension, don't need to add as a dependency
+      'L3MON4D3/LuaSnip',
+    },
+    version = '*',
+    lazy = true,
+  },
+  -- Vim Commentary configuration (from plugins.vim-commentary)
+  {
+    'tpope/vim-commentary',
+    event = 'VeryLazy',
+  },
   -- require 'kickstart.plugins.neo-tree',
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
   --
@@ -983,3 +1353,5 @@ vim.keymap.set('n', '<leader><leader>', require('buffer-picker').pick, { desc = 
 vim.api.nvim_create_user_command('ZettelMigrateAlias', function()
   require('gpt-obsidian-migration').migrate_current_file_with_alias_links()
 end, {})
+
+vim.keymap.set('n', '<leader>r', '<cmd>source %<CR>', { desc = '[R]un current file' }) -- works for lua files
