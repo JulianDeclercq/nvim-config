@@ -1295,6 +1295,11 @@ local function save_if_writable()
     return
   end
 
+  -- only save if buffer has been modified
+  if not vim.bo.modified then
+    return
+  end
+
   vim.cmd 'silent! write'
 end
 
