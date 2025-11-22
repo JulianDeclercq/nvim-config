@@ -324,10 +324,6 @@ require('lazy').setup({
 
       local capabilities = require('blink.cmp').get_lsp_capabilities()
 
-      -- Compute LÖVE library paths for lua_ls
-      local love2d_library_path = vim.fn.stdpath('data') .. '/lazy/love2d.nvim/love2d/library'
-      local luasocket_library_path = vim.fn.stdpath('data') .. '/lazy/love2d.nvim/luasocket/library'
-
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
       --
@@ -378,18 +374,15 @@ require('lazy').setup({
                 callSnippet = 'Replace',
               },
               diagnostics = {
-                globals = { 'love' },
+                globals = { 'vim' }, -- Only vim global by default
               },
               runtime = {
-                version = 'LuaJIT', -- LÖVE uses LuaJIT (Lua 5.1)
+                version = 'Lua 5.1', -- Default to Lua 5.1
               },
               workspace = {
                 library = {
-                  -- Add love2d.nvim library paths for LÖVE API definitions
                   vim.fn.expand('$VIMRUNTIME/lua'),
                   vim.fn.expand('$VIMRUNTIME/lua/vim/lsp'),
-                  love2d_library_path,
-                  luasocket_library_path,
                 },
                 checkThirdParty = false,
               },
@@ -1052,22 +1045,8 @@ require('lazy').setup({
       },
     },
   },
-  -- Love2D configuration (from plugins.love2d)
-  {
-    'S1M0N38/love2d.nvim',
-    event = 'VeryLazy',
-    version = '2.*',
-    opts = {
-      -- Ensure LSP integration is enabled
-      lsp = {
-        enabled = true,
-      },
-    },
-    keys = {
-      { '<leader>lr', '<cmd>LoveRun<cr>', ft = 'lua', desc = '[L]ÖVE [R]un' },
-      { '<leader>ls', '<cmd>LoveStop<cr>', ft = 'lua', desc = '[L]ÖVE [S]top' },
-    },
-  },
+  -- Love2D support is now handled via .luarc.json files in Love2D projects
+  -- Removed S1M0N38/love2d.nvim plugin due to LSP conflicts
   -- Notify configuration (from plugins.notify)
   {
     'rcarriga/nvim-notify',
@@ -1355,3 +1334,14 @@ vim.api.nvim_create_user_command('ZettelMigrateAlias', function()
 end, {})
 
 vim.keymap.set('n', '<leader>r', '<cmd>source %<CR>', { desc = '[R]un current file' }) -- works for lua files
+
+-- Love2D keybindings (manual implementation since we removed the plugin)
+vim.keymap.set('n', '<leader>lr', function()
+  local current_dir = vim.fn.expand('%:p:h')
+  -- Check if we're in a Love2D project (has main.lua)
+  if vim.fn.filereadable(current_dir .. '/main.lua') == 1 then
+    vim.cmd('!' .. (vim.fn.has('win32') == 1 and 'love.exe' or 'love') .. ' "' .. current_dir .. '"')
+  else
+    vim.notify('Not in a Love2D project (no main.lua found)', vim.log.levels.WARN)
+  end
+end, { desc = '[L]ÖVE [R]un' })
