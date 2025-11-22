@@ -1340,7 +1340,16 @@ vim.keymap.set('n', '<leader>lr', function()
   local current_dir = vim.fn.expand('%:p:h')
   -- Check if we're in a Love2D project (has main.lua)
   if vim.fn.filereadable(current_dir .. '/main.lua') == 1 then
-    vim.cmd('!' .. (vim.fn.has('win32') == 1 and 'love.exe' or 'love') .. ' "' .. current_dir .. '"')
+    local love_cmd = (vim.fn.has('win32') == 1 and 'love.exe' or 'love')
+    local full_cmd
+    if vim.fn.has('win32') == 1 then
+      -- Windows: use 'start ""' to launch detached
+      full_cmd = 'start "" ' .. love_cmd .. ' "' .. current_dir .. '"'
+    else
+      -- Unix: run in background with &
+      full_cmd = love_cmd .. ' "' .. current_dir .. '" &'
+    end
+    vim.cmd('!' .. full_cmd)
   else
     vim.notify('Not in a Love2D project (no main.lua found)', vim.log.levels.WARN)
   end
