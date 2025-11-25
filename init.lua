@@ -118,7 +118,7 @@ vim.keymap.set('v', '<leader>w', '<C-w>', { noremap = true, silent = true, desc 
 vim.keymap.set('n', '<leader>h', '<C-w>h', { desc = 'Go to left window' })
 vim.keymap.set('n', '<leader>j', '<C-w>j', { desc = 'Go to lower window' })
 -- vim.keymap.set('n', '<leader>k', '<C-w>k', { desc = 'Go to upper window' }) -- commented since I want to use it for hover info for now
--- vim.keymap.set('n', '<leader>l', '<C-w>l', { desc = 'Go to right window' }) -- commented since I want to use it for lua stuff for now
+vim.keymap.set('n', '<leader>l', '<C-w>l', { desc = 'Go to right window' }) -- commented since I want to use it for lua stuff for now
 
 -- Highlight when yanking (copying) text
 vim.api.nvim_create_autocmd('TextYankPost', {
@@ -381,8 +381,8 @@ require('lazy').setup({
               },
               workspace = {
                 library = {
-                  vim.fn.expand('$VIMRUNTIME/lua'),
-                  vim.fn.expand('$VIMRUNTIME/lua/vim/lsp'),
+                  vim.fn.expand '$VIMRUNTIME/lua',
+                  vim.fn.expand '$VIMRUNTIME/lua/vim/lsp',
                 },
                 checkThirdParty = false,
               },
@@ -871,7 +871,12 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>f.', builtin.oldfiles, { desc = '[F]ind Recent Files ("." for repeat)' })
       -- vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
       vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = '[F]ind existing [B]uffers' })
-      vim.keymap.set('n', '<leader>fof', "<Cmd>lua require('telescope.builtin').oldfiles()<CR>", { noremap = true, silent = true, desc = '[F]ind [O]ld [F]iles' })
+      vim.keymap.set(
+        'n',
+        '<leader>fof',
+        "<Cmd>lua require('telescope.builtin').oldfiles()<CR>",
+        { noremap = true, silent = true, desc = '[F]ind [O]ld [F]iles' }
+      )
       vim.keymap.set('n', '<leader>fbm', require('bookmark-utils').open_bookmarks_picker, { desc = '[F]ind [B]ookmarks' })
 
       -- Slightly advanced example of overriding default behavior and theme
@@ -1341,21 +1346,21 @@ end, {})
 vim.keymap.set('n', '<leader>r', '<cmd>source %<CR>', { desc = '[R]un current file' }) -- works for lua files
 
 -- Love2D keybindings (manual implementation since we removed the plugin)
-vim.keymap.set('n', '<leader>lr', function()
-  local current_dir = vim.fn.expand('%:p:h')
+vim.keymap.set('n', '<leader>rl', function()
+  local current_dir = vim.fn.expand '%:p:h'
   -- Check if we're in a Love2D project (has main.lua)
   if vim.fn.filereadable(current_dir .. '/main.lua') == 1 then
-    local love_cmd = (vim.fn.has('win32') == 1 and 'love.exe' or 'love')
+    local love_cmd = (vim.fn.has 'win32' == 1 and 'love.exe' or 'love')
     local full_cmd
-    if vim.fn.has('win32') == 1 then
+    if vim.fn.has 'win32' == 1 then
       -- Windows: use 'start ""' to launch detached
       full_cmd = 'start "" ' .. love_cmd .. ' "' .. current_dir .. '"'
     else
       -- Unix: run in background with &
       full_cmd = love_cmd .. ' "' .. current_dir .. '" &'
     end
-    vim.cmd('!' .. full_cmd)
+    vim.cmd('silent !' .. full_cmd)
   else
     vim.notify('Not in a Love2D project (no main.lua found)', vim.log.levels.WARN)
   end
-end, { desc = '[L]ÖVE [R]un' })
+end, { desc = '[R]un [L]ÖVE' })
