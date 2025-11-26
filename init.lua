@@ -1343,8 +1343,9 @@ vim.api.nvim_create_user_command('ZettelMigrateAlias', function()
   require('gpt-obsidian-migration').migrate_current_file_with_alias_links()
 end, {})
 
-vim.keymap.set('n', '<leader>r', '<cmd>source %<CR>', { desc = '[R]un current file' }) -- works for lua files
--- Run LOVE in a temporary terminal split: <leader>rl
+vim.keymap.set('n', '<leader>rf', '<cmd>source %<CR>', { desc = '[R]un current [F]ile' }) -- works for lua files
+
+-- Run LOVE in a temporary terminal split
 vim.keymap.set('n', '<leader>rl', function()
   local current_dir = vim.fn.expand '%:p:h'
 
