@@ -1353,6 +1353,7 @@ vim.keymap.set('n', '<leader>rl', function()
   local cmd = love_cmd .. ' --console "' .. current_dir .. '"'
 
   vim.cmd 'split'
+  vim.api.nvim_win_set_height(0, 10)
   vim.cmd('terminal ' .. cmd)
 
   -- make the buffer temporary
