@@ -1344,23 +1344,34 @@ vim.api.nvim_create_user_command('ZettelMigrateAlias', function()
 end, {})
 
 vim.keymap.set('n', '<leader>r', '<cmd>source %<CR>', { desc = '[R]un current file' }) -- works for lua files
-
--- Love2D keybindings (manual implementation since we removed the plugin)
+-- Run LOVE in a temporary terminal split: <leader>rl
 vim.keymap.set('n', '<leader>rl', function()
   local current_dir = vim.fn.expand '%:p:h'
-  -- Check if we're in a Love2D project (has main.lua)
-  if vim.fn.filereadable(current_dir .. '/main.lua') == 1 then
-    local love_cmd = (vim.fn.has 'win32' == 1 and 'love.exe' or 'love')
-    local full_cmd
-    if vim.fn.has 'win32' == 1 then
-      -- Windows: use 'start ""' to launch detached
-      full_cmd = 'start "" ' .. love_cmd .. ' "' .. current_dir .. '"'
-    else
-      -- Unix: run in background with &
-      full_cmd = love_cmd .. ' "' .. current_dir .. '" &'
-    end
-    vim.cmd('silent !' .. full_cmd)
-  else
-    vim.notify('Not in a Love2D project (no main.lua found)', vim.log.levels.WARN)
-  end
+
+  local love_cmd = (vim.fn.has 'win32' == 1) and 'love.exe' or 'love'
+  local cmd = love_cmd .. ' --console "' .. current_dir .. '"'
+
+  vim.cmd 'split'
+  vim.cmd('terminal ' .. cmd)
+
+  -- make the buffer temporary
+  local term_buf = vim.api.nvim_get_current_buf()
+  vim.bo[term_buf].bufhidden = 'wipe'
+
+  vim.cmd 'startinsert'
 end, { desc = '[R]un [L]ÖVE' })
+
+-- auto-close LOVE terminal window when process exits
+vim.api.nvim_create_autocmd('TermClose', {
+  pattern = 'term://*love*',
+  callback = function(args)
+    vim.schedule(function()
+      local info = vim.fn.getbufinfo(args.buf)[1]
+      if info and info.windows then
+        for _, win in ipairs(info.windows) do
+          pcall(vim.api.nvim_win_close, win, true)
+        end
+      end
+    end)
+  end,
+})
