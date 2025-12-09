@@ -1343,7 +1343,15 @@ vim.api.nvim_create_user_command('ZettelMigrateAlias', function()
   require('gpt-obsidian-migration').migrate_current_file_with_alias_links()
 end, {})
 
-vim.keymap.set('n', '<leader>rf', '<cmd>source %<CR>', { desc = '[R]un current [F]ile' }) -- works for lua files
+-- works for lua files, but commented now in favor of the next one
+-- vim.keymap.set('n', '<leader>rf', '<cmd>source %<CR>', { desc = '[R]un current [F]ile' })
+
+-- need to have lua command available, on MacOS just brew install lua
+vim.keymap.set('n', '<leader>rf', function()
+  vim.cmd.write() -- save file
+  local file = vim.fn.expand '%:p'
+  vim.cmd('vsplit term://lua ' .. vim.fn.fnameescape(file))
+end, { desc = 'Run current Lua file in terminal' })
 
 -- Run LOVE in a temporary terminal split
 vim.keymap.set('n', '<leader>rl', function()
