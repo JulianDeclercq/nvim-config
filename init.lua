@@ -1346,12 +1346,25 @@ end, {})
 -- works for lua files, but commented now in favor of the next one
 -- vim.keymap.set('n', '<leader>rf', '<cmd>source %<CR>', { desc = '[R]un current [F]ile' })
 
--- need to have lua command available, on MacOS just brew install lua
 vim.keymap.set('n', '<leader>rf', function()
-  vim.cmd.write() -- save file
-  local file = vim.fn.expand '%:p'
-  vim.cmd('vsplit term://lua ' .. vim.fn.fnameescape(file))
-end, { desc = 'Run current Lua file in terminal' })
+  vim.cmd.write()
+
+  local file = vim.fn.fnameescape(vim.fn.expand '%:p')
+
+  -- Open a vertical split with a normal buffer
+  vim.cmd 'vnew'
+
+  -- Read command output directly into the buffer
+  vim.cmd('read !nvim --headless -c "luafile ' .. file .. '" +qa')
+
+  -- Clean up the first empty line
+  vim.cmd 'normal! ggdd'
+
+  -- Set buffer options
+  vim.bo.buftype = 'nofile'
+  vim.bo.bufhidden = 'wipe'
+  vim.bo.swapfile = false
+end, { desc = 'Run Lua file and show output in vertical buffer' })
 
 -- Run LOVE in a temporary terminal split
 vim.keymap.set('n', '<leader>rl', function()
