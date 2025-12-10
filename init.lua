@@ -377,7 +377,8 @@ require('lazy').setup({
                 globals = { 'vim' }, -- Only vim global by default
               },
               runtime = {
-                version = 'Lua 5.1', -- Default to Lua 5.1
+                -- version = 'Lua 5.1', -- Default to Lua 5.1
+                version = 'Lua 5.4', -- Default to Lua 5.1
               },
               workspace = {
                 library = {
@@ -1398,3 +1399,12 @@ vim.api.nvim_create_autocmd('TermClose', {
     end)
   end,
 })
+
+if is_windows then
+  local shada_dir = vim.fn.stdpath 'data' .. '/shada/'
+  if vim.fn.isdirectory(shada_dir) == 1 then
+    for _, file in ipairs(vim.fn.glob(shada_dir .. 'main.shada.tmp*', false, true)) do
+      pcall(vim.fn.delete, file)
+    end
+  end
+end
