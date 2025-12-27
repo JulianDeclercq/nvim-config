@@ -439,7 +439,7 @@ require('lazy').setup({
       notify_on_error = false,
       format_on_save = function(bufnr)
         -- Disable "format_on_save lsp_fallback" for languages that don't have a well standardized coding style.
-        local disable_filetypes = { c = true, cpp = true, cs = true }
+        local disable_filetypes = { c = true, cpp = true, cs = true, markdown = true }
         local fileType = vim.bo[bufnr].filetype
         if disable_filetypes[fileType] then
           return nil
@@ -488,7 +488,7 @@ require('lazy').setup({
         html = { 'prettierd', 'prettier', stop_after_first = true },
         css = { 'prettierd', 'prettier', stop_after_first = true },
         -- json = { 'prettierd', 'prettier', stop_after_first = true },
-        markdown = { 'prettierd', 'prettier', stop_after_first = true },
+        -- markdown = { 'prettierd', 'prettier', stop_after_first = true },
         lua = { 'stylua' },
         cs = { 'dotnet_format' },
         ['*'] = { 'trim_whitespace' },

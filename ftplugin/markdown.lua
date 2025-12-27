@@ -10,3 +10,6 @@ vim.bo.tabstop = 2
 
 -- Turn on spell‐checking in Markdown (optional)
 vim.wo.spell = true
+
+-- Prevent folds from closing when switching windows
+vim.opt_local.foldclose = ''
