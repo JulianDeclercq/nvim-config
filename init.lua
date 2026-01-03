@@ -1371,6 +1371,11 @@ end, { desc = 'Run Lua file and show output in vertical buffer' })
 vim.keymap.set('n', '<leader>rl', function()
   local current_dir = vim.fn.expand '%:p:h'
 
+  -- in some projects, I have all code inside a code directory instead of the main directory
+  if current_dir:find 'code' ~= nil then
+    current_dir = vim.fn.fnamemodify(current_dir, ':h')
+  end
+
   local love_cmd = (vim.fn.has 'win32' == 1) and 'love.exe' or 'love'
   local cmd = love_cmd .. ' --console "' .. current_dir .. '"'
 
