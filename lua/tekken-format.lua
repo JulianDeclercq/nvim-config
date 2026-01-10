@@ -94,9 +94,37 @@ end
 
 ---@param target string
 local function replace_word_under_cursor(target)
-  vim.cmd 'normal! viW' -- visual select inner word
-  vim.fn.setreg('z', target) -- put the target in a temp register
-  vim.cmd 'normal! "_d"zP' -- paste over the selection without yanking the word to default register
+  local buf = 0
+  local row, col0 = unpack(vim.api.nvim_win_get_cursor(0)) -- row is 1-based, col is 0-based
+  local line = vim.api.nvim_buf_get_lines(buf, row - 1, row, false)[1]
+
+  -- Find the non-whitespace "WORD" run at/near the cursor and replace it by columns.
+  local s = col0 + 1
+  local e = col0 + 1
+
+  -- If cursor is on whitespace, move right to the next non-space
+  if line:sub(s, s):match '%s' then
+    local next_nonspace = line:find('%S', s)
+    if not next_nonspace then
+      return
+    end
+    s = next_nonspace
+    e = next_nonspace
+  end
+
+  -- expand left
+  while s > 1 and not line:sub(s - 1, s - 1):match '%s' do
+    s = s - 1
+  end
+
+  -- expand right
+  while e <= #line and not line:sub(e, e):match '%s' do
+    e = e + 1
+  end
+  e = e - 1
+
+  -- Replace range (0-based columns, end column is exclusive)
+  vim.api.nvim_buf_set_text(buf, row - 1, s - 1, row - 1, e, { target })
 end
 
 local function create_link(link_formatter)
