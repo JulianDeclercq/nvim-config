@@ -1,0 +1,6 @@
+tags
+.luarc.json
+nvim
+spell/
+lazy-lock.json
+.idea/*
