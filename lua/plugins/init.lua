@@ -13,7 +13,7 @@ vim.api.nvim_create_autocmd('PackChanged', {
 })
 
 -- Plugins
-vim.pack.add {
+local specs = {
   gh 'nvim-lua/plenary.nvim',
   gh 'nvim-tree/nvim-web-devicons',
   gh 'folke/tokyonight.nvim',
@@ -33,9 +33,22 @@ vim.pack.add {
   gh 'nvim-telescope/telescope-fzf-native.nvim',
   gh 'nvim-telescope/telescope-ui-select.nvim',
   gh 'benfowler/telescope-luasnip.nvim',
-  gh 'tomasky/bookmarks.nvim',
-  gh 'JulianDeclercq/obsidian-cli.nvim',
 }
+
+-- Prefer local dev copy if present, else fall back to GitHub fork
+local function local_or_gh(local_path, gh_repo)
+  if vim.fn.isdirectory(local_path) == 1 then
+    vim.opt.rtp:prepend(local_path)
+  else
+    table.insert(specs, gh(gh_repo))
+  end
+end
+
+local_or_gh('C:/Repositories/obsidian-cli.nvim', 'JulianDeclercq/obsidian-cli.nvim')
+local_or_gh('C:/Repositories/bookmarks.nvim', 'JulianDeclercq/bookmarks.nvim')
+
+vim.pack.add(specs)
+
 
 -- Plugin configurations (order matters: colorscheme first, then UI, then the rest)
 require('plugins.tokyonight')
