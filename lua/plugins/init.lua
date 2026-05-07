@@ -5,8 +5,21 @@ end
 -- Post-install/update hook: build telescope-fzf-native
 vim.api.nvim_create_autocmd('PackChanged', {
   callback = function(ev)
-    if ev.data.spec.name == 'telescope-fzf-native.nvim' and vim.fn.executable 'make' == 1 then
-      local path = vim.fn.stdpath 'data' .. '/site/pack/core/opt/telescope-fzf-native.nvim'
+    if ev.data.spec.name ~= 'telescope-fzf-native.nvim' then return end
+    local path = vim.fn.stdpath 'data' .. '/site/pack/core/opt/telescope-fzf-native.nvim'
+    if vim.fn.has 'win32' == 1 then
+      if vim.fn.executable 'cmake' ~= 1 then
+        vim.notify('telescope-fzf-native: cmake not found, native sorter not built', vim.log.levels.WARN)
+        return
+      end
+      vim.fn.system { 'cmake', '-S', path, '-B', path .. '/build', '-DCMAKE_BUILD_TYPE=Release' }
+      vim.fn.system { 'cmake', '--build', path .. '/build', '--config', 'Release' }
+      vim.fn.system { 'cmake', '--install', path .. '/build', '--prefix', path .. '/build' }
+    else
+      if vim.fn.executable 'make' ~= 1 then
+        vim.notify('telescope-fzf-native: make not found, native sorter not built', vim.log.levels.WARN)
+        return
+      end
       vim.fn.system { 'make', '-C', path }
     end
   end,
