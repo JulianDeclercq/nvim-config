@@ -12,7 +12,7 @@ vim.api.nvim_create_autocmd('PackChanged', {
         vim.notify('telescope-fzf-native: cmake not found, native sorter not built', vim.log.levels.WARN)
         return
       end
-      vim.fn.system { 'cmake', '-S', path, '-B', path .. '/build', '-DCMAKE_BUILD_TYPE=Release' }
+      vim.fn.system { 'cmake', '-S', path, '-B', path .. '/build', '-G', 'Ninja', '-DCMAKE_BUILD_TYPE=Release' }
       vim.fn.system { 'cmake', '--build', path .. '/build', '--config', 'Release' }
       vim.fn.system { 'cmake', '--install', path .. '/build', '--prefix', path .. '/build' }
     else
