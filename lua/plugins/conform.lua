@@ -7,8 +7,16 @@ require('conform').setup {
     }
   end,
 
+  formatters = {
+    frontmatter = {
+      command = vim.fn.stdpath 'config' .. '/scripts/fmt-frontmatter',
+      stdin = true,
+    },
+  },
+
   formatters_by_ft = {
     ['*'] = { 'trim_whitespace' },
+    markdown = { 'frontmatter' }, -- normalize YAML frontmatter flow-lists -> block-lists
   },
 }
 

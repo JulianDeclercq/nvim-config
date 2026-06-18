@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+# Conform formatter: normalize YAML frontmatter flow-lists -> block-lists.
+# Reads markdown on stdin, writes to stdout. Only the first `---`...`---`
+# block is touched; the markdown body is passed through byte-for-byte.
+# ponytail: handles simple `key: [a, "b", c]` only. Empty `[]`, nested maps,
+# and multiline values are left as-is. Upgrade to a YAML lib if that bites.
+import re
+import sys
+
+# key: [ ... ]  with a non-empty inner part
+FLOW = re.compile(r'^(?P<indent>\s*)(?P<key>[\w-]+):\s*\[(?P<body>.+)\]\s*$')
+
+
+def split_items(body):
+    """Split a flow-list body on top-level commas, respecting quotes."""
+    items, buf, quote = [], '', None
+    for ch in body:
+        if quote:
+            buf += ch
+            if ch == quote:
+                quote = None
+        elif ch in '"\'':
+            quote = ch
+            buf += ch
+        elif ch == ',':
+            items.append(buf)
+            buf = ''
+        else:
+            buf += ch
+    if buf.strip() or items:
+        items.append(buf)
+    return [i.strip() for i in items if i.strip()]
+
+
+def convert(line):
+    m = FLOW.match(line)
+    if not m:
+        return line
+    items = split_items(m.group('body'))
+    if not items:
+        return line
+    indent, key = m.group('indent'), m.group('key')
+    out = [f'{indent}{key}:']
+    out += [f'{indent}  - {it}' for it in items]
+    return '\n'.join(out)
+
+
+def main():
+    text = sys.stdin.read()
+    lines = text.split('\n')
+    if not lines or lines[0] != '---':
+        sys.stdout.write(text)
+        return
+    end = next((i for i in range(1, len(lines)) if lines[i] == '---'), None)
+    if end is None:
+        sys.stdout.write(text)
+        return
+    lines[1:end] = [convert(l) for l in lines[1:end]]
+    sys.stdout.write('\n'.join(lines))
+
+
+if __name__ == '__main__':
+    main()
