@@ -25,6 +25,7 @@ local function is_valid_character(character)
     'kazuya',
     'king',
     'kuma',
+    'kunimitsu',
     'lars',
     'law',
     'lee',

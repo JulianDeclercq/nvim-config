@@ -20,7 +20,7 @@ vim.keymap.set('n', '<leader>l', '<C-w>l', { desc = 'Go to right window' }) -- c
 
 -- Tekken
 vim.keymap.set('n', '<leader>td', require('tekken-format').tekken_docs_link, { desc = 'Format [T]ekken [D]ocs link' })
-vim.keymap.set('n', '<leader>to', require('tekken-format').okizeme_link, { desc = 'Format [T[ekken [O]kizeme link' })
+vim.keymap.set('n', '<leader>to', require('tekken-format').okizeme_link, { desc = 'Format [T]ekken [O]kizeme link' })
 vim.keymap.set('n', '<leader>ft', require('tekken-picker').pick, { desc = '[F]ind [T]ekken' })
 
 -- Buffer picker
