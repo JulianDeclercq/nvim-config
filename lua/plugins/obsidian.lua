@@ -1,6 +1,9 @@
 require('obsidian-cli').setup {
   vault = 'The Cache',
   vault_path = require('config.paths').obsidian,
+  daily_notes = {
+    folder = '_Dailies',
+  },
 }
 
 vim.keymap.set('n', '<leader>on', function() require('obsidian-cli').create_note() end, { desc = '[O]bsidian: [N]ew Note' })
