@@ -8,5 +8,4 @@ vim.wo.concealcursor = 'nc'
 vim.bo.shiftwidth = 2
 vim.bo.tabstop = 2
 
--- Turn on spell‐checking in Markdown (optional)
-vim.wo.spell = true
+vim.wo.spell = false
