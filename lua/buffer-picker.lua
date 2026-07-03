@@ -11,23 +11,30 @@ end
 ---@param bufnr number
 ---@return string
 local function get_obsidian_name(bufnr)
-  -- get first alias
-  local alias = ''
+  -- collect all aliases
+  local aliases = {}
   local lines = vim.api.nvim_buf_get_lines(bufnr, 0, 20, false)
-  for i, line in ipairs(lines) do
-    if vim.startswith(line, 'aliases') then
-      alias = lines[i + 1]:match '%- (.+)%s*$' -- only keep the alias itself, remove all else from the line
+  local in_aliases = false
+  for _, line in ipairs(lines) do
+    if in_aliases then
+      local alias = line:match '^%s*%- (.-)%s*$' -- only keep the alias itself, remove all else from the line
+      if alias then
+        table.insert(aliases, alias)
+      else
+        break -- end of the aliases list
+      end
+    elseif vim.startswith(line, 'aliases') then
+      in_aliases = true
     end
   end
 
-  if is_empty(alias) then
+  if #aliases == 0 then
     return ''
   end
 
   local old_name = vim.api.nvim_buf_get_name(bufnr)
   local extension = vim.fn.fnamemodify(old_name, ':e')
-  local new_name = alias:sub(1) .. (extension ~= '' and ('.' .. extension) or '')
-  return new_name
+  return table.concat(aliases, ', ') .. (extension ~= '' and ('.' .. extension) or '')
 end
 
 function module.pick()
