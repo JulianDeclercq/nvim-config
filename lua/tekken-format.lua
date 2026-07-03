@@ -167,6 +167,7 @@ local function create_link(link_formatter)
   local move = vim.fn.expand '<cWORD>'
   local character = get_closest_character_name()
   if character == nil then
+    vim.notify('No Tekken character found above cursor', vim.log.levels.WARN)
     return
   end
 
