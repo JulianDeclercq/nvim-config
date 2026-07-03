@@ -66,7 +66,7 @@ function module.pick()
 
       local icon, icon_highlight_group = require('nvim-web-devicons').get_icon(bufferName, vim.fn.fnamemodify(bufferName, ':e'), { default = true })
 
-      if vim.startswith(bufferName, paths.obsidian) then
+      if vim.startswith(bufferName:gsub('\\', '/'), paths.obsidian) then
         local obsidian_name = get_obsidian_name(bufNr)
         if not is_empty(obsidian_name) then
           displayName = obsidian_name
@@ -92,7 +92,7 @@ function module.pick()
 
   -- Previewer: copy the selected buffer's text into the preview buffer
   local buffer_previewer = previewers.new_buffer_previewer {
-    title = 'Grep Preview',
+    title = 'Preview',
     get_buffer_by_name = function(_, entry)
       return 'telescope-bufpreview-' .. entry.value
     end,
@@ -113,7 +113,7 @@ function module.pick()
 
   pickers
     .new({}, {
-      prompt_title = 'Julles test',
+      prompt_title = 'Open Buffers',
       finder = finders.new_table {
         results = entries,
         entry_maker = function(e)
